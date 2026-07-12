@@ -1,6 +1,6 @@
 import { Plus } from "lucide-react";
 
-export default function TasksHeader() {
+export default function TasksHeader({ onNewTask }) {
   return (
     <div className="mb-7 flex items-start justify-between">
       <div>
@@ -9,7 +9,10 @@ export default function TasksHeader() {
           Drag cards between columns to update their status.
         </p>
       </div>
-      <button className="flex h-11 items-center gap-1.5 rounded-lg bg-blue-600 px-4 text-[15px] font-medium text-white hover:bg-blue-700">
+      <button
+        onClick={onNewTask}
+        className="flex h-11 items-center gap-1.5 rounded-lg bg-blue-600 px-4 text-[15px] font-medium text-white hover:bg-blue-700"
+      >
         <Plus size={17} />
         New Task
       </button>

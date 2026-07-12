@@ -21,7 +21,7 @@ export default function KanbanColumn({
     <div
       onDragOver={(e) => onDragOver(e, title)}
       onDrop={(e) => onDrop(e, title)}
-      className={`flex w-72 shrink-0 flex-col rounded-2xl border p-3 transition-colors ${
+      className={`flex w-full flex-col rounded-2xl border p-3 transition-colors md:w-72 md:shrink-0 ${
         isDragOver ? "border-blue-300 bg-blue-50/40" : "border-gray-200 bg-gray-50"
       }`}
     >
