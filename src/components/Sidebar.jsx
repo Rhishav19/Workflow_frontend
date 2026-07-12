@@ -3,12 +3,8 @@ import {
   FolderKanban,
   CheckSquare,
   Users,
-  CalendarDays,
-  BarChart3,
-  Clock3,
   FileText,
   Megaphone,
-  Settings,
 } from "lucide-react";
 
 import { NavLink } from "react-router-dom";
@@ -35,21 +31,6 @@ const menus = [
     path: "/members",
   },
   {
-    name: "Meetings",
-    icon: <CalendarDays size={20} />,
-    path: "/meetings",
-  },
-  {
-    name: "Analytics",
-    icon: <BarChart3 size={20} />,
-    path: "/analytics",
-  },
-  {
-    name: "Time Tracking",
-    icon: <Clock3 size={20} />,
-    path: "/time-tracking",
-  },
-  {
     name: "Docs",
     icon: <FileText size={20} />,
     path: "/docs",
@@ -58,11 +39,6 @@ const menus = [
     name: "Announcements",
     icon: <Megaphone size={20} />,
     path: "/announcements",
-  },
-  {
-    name: "Settings",
-    icon: <Settings size={20} />,
-    path: "/settings",
   },
 ];
 

@@ -24,7 +24,7 @@ export default function KanbanBoard({ tasks, onMoveTask, onChangePriority }) {
   }
 
   return (
-    <div className="flex gap-4 overflow-x-auto pb-4">
+    <div className="flex min-w-0 flex-col gap-4 pb-4 md:flex-row md:overflow-x-auto">
       {columns.map((column) => (
         <KanbanColumn
           key={column}

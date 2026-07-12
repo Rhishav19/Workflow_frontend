@@ -1,12 +1,25 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import ProjectsHeader from "../components/projects/ProjectsHeader";
 import ProjectsToolbar from "../components/projects/ProjectsToolbar";
 import ProjectsGrid from "../components/projects/ProjectsGrid";
-import { projects } from "../data/projects";
+import NewProjectModal from "../components/projects/NewProjectModal";
+import { projects as initialProjects } from "../data/projects";
 
 export default function Projects() {
+  const [projects, setProjects] = useState(initialProjects);
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState("All");
+  const [modalOpen, setModalOpen] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  useEffect(() => {
+    if (searchParams.get("new") === "true") {
+      setModalOpen(true);
+      searchParams.delete("new");
+      setSearchParams(searchParams, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
 
   const filtered = useMemo(() => {
     return projects.filter((project) => {
@@ -17,11 +30,15 @@ export default function Projects() {
         project.department.toLowerCase().includes(query.toLowerCase());
       return matchesFilter && matchesQuery;
     });
-  }, [query, filter]);
+  }, [projects, query, filter]);
+
+  function handleCreate(newProject) {
+    setProjects((prev) => [newProject, ...prev]);
+  }
 
   return (
     <div className="px-8 py-8">
-      <ProjectsHeader />
+      <ProjectsHeader onNewProject={() => setModalOpen(true)} />
       <ProjectsToolbar
         query={query}
         onQueryChange={setQuery}
@@ -29,6 +46,13 @@ export default function Projects() {
         onFilterChange={setFilter}
       />
       <ProjectsGrid projects={filtered} />
+
+      {modalOpen && (
+        <NewProjectModal
+          onClose={() => setModalOpen(false)}
+          onCreate={handleCreate}
+        />
+      )}
     </div>
   );
 }
