@@ -1,6 +1,6 @@
 import { Plus } from "lucide-react";
 
-export default function ProjectsHeader() {
+export default function ProjectsHeader({ onNewProject }) {
   return (
     <div className="mb-7 flex items-start justify-between">
       <div>
@@ -9,7 +9,10 @@ export default function ProjectsHeader() {
           Track progress across every active initiative.
         </p>
       </div>
-      <button className="flex h-11 items-center gap-1.5 rounded-lg bg-blue-600 px-4 text-[15px] font-medium text-white hover:bg-blue-700">
+      <button
+        onClick={onNewProject}
+        className="flex h-11 items-center gap-1.5 rounded-lg bg-blue-600 px-4 text-[15px] font-medium text-white hover:bg-blue-700"
+      >
         <Plus size={17} />
         New Project
       </button>
