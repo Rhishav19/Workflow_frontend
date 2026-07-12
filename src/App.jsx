@@ -6,6 +6,7 @@ import Tasks from "./pages/Tasks";
 import Members from "./pages/Members";
 import Docs from "./pages/Docs";
 import Announcements from "./pages/Announcements";
+import Settings from "./pages/Settings";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
         <Route path="members" element={<Members />} />
         <Route path="docs" element={<Docs />} />
         <Route path="announcements" element={<Announcements />} />
+        <Route path="settings" element={<Settings />} />
       </Route>
     </Routes>
   );

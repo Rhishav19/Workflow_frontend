@@ -1,10 +1,17 @@
+import { useState } from "react";
 import {
   Bell,
   Search,
   Settings,
+  User,
+  LogOut,
+  ChevronDown,
 } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Navbar = () => {
+  const [menuOpen, setMenuOpen] = useState(false);
+
   return (
     <header className="bg-white shadow-sm px-8 py-4 flex justify-between items-center">
 
@@ -27,13 +34,70 @@ const Navbar = () => {
 
         <Bell className="cursor-pointer" />
 
-        <Settings className="cursor-pointer" />
+        <Link to="/settings">
+          <Settings className="cursor-pointer text-gray-600 hover:text-blue-600" />
+        </Link>
 
-        <img
-          src="https://i.pravatar.cc/40"
-          alt="profile"
-          className="w-10 h-10 rounded-full"
-        />
+        <div className="relative">
+          <button
+            onClick={() => setMenuOpen((open) => !open)}
+            className="flex items-center gap-1.5"
+          >
+            <img
+              src="https://i.pravatar.cc/40"
+              alt="profile"
+              className="w-10 h-10 rounded-full"
+            />
+            <ChevronDown
+              size={16}
+              className={`text-gray-400 transition-transform ${menuOpen ? "rotate-180" : ""}`}
+            />
+          </button>
+
+          {menuOpen && (
+            <>
+              <div
+                className="fixed inset-0 z-10"
+                onClick={() => setMenuOpen(false)}
+              />
+              <div className="absolute right-0 top-12 z-20 w-56 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg">
+                <div className="border-b border-gray-100 px-4 py-3">
+                  <p className="text-sm font-semibold text-gray-900">Alex Rivera</p>
+                  <p className="text-xs text-gray-400">alex.rivera@workflow.com</p>
+                </div>
+
+                <Link
+                  to="/settings"
+                  onClick={() => setMenuOpen(false)}
+                  className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50"
+                >
+                  <User size={16} />
+                  My Profile
+                </Link>
+
+                <Link
+                  to="/settings"
+                  onClick={() => setMenuOpen(false)}
+                  className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50"
+                >
+                  <Settings size={16} />
+                  Settings
+                </Link>
+
+                <button
+                  onClick={() => {
+                    setMenuOpen(false);
+                    alert("Logout needs auth/session logic — placeholder for now.");
+                  }}
+                  className="flex w-full items-center gap-2.5 border-t border-gray-100 px-4 py-2.5 text-left text-sm text-red-600 hover:bg-red-50"
+                >
+                  <LogOut size={16} />
+                  Log out
+                </button>
+              </div>
+            </>
+          )}
+        </div>
 
       </div>
 
