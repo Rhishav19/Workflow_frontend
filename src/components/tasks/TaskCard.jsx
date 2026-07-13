@@ -1,11 +1,25 @@
 import { useState } from "react";
-import { Calendar, ChevronDown } from "lucide-react";
+import { Calendar, ChevronDown, Send, Check, RotateCcw, FileText } from "lucide-react";
 import { PRIORITY_STYLES } from "../../data/tasks";
+import { useAuth } from "../../context/AuthContext";
+import { hasPermission } from "../../data/permissions";
 
 const PRIORITIES = ["High", "Medium", "Low"];
 
-export default function TaskCard({ task, onDragStart, isDragging, onChangePriority }) {
+export default function TaskCard({
+  task,
+  onDragStart,
+  isDragging,
+  onChangePriority,
+  onOpenSubmit,
+  onApprove,
+  onRequestChanges,
+}) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const { user } = useAuth();
+  const canReview = hasPermission(user?.role, "canReviewTask");
+
+  const canSubmit = task.status !== "Review" && task.status !== "Done";
 
   return (
     <div
@@ -28,10 +42,7 @@ export default function TaskCard({ task, onDragStart, isDragging, onChangePriori
 
           {menuOpen && (
             <>
-              <div
-                className="fixed inset-0 z-10"
-                onClick={() => setMenuOpen(false)}
-              />
+              <div className="fixed inset-0 z-10" onClick={() => setMenuOpen(false)} />
               <div className="absolute left-0 top-7 z-20 w-28 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-lg">
                 {PRIORITIES.map((p) => (
                   <button
@@ -63,10 +74,56 @@ export default function TaskCard({ task, onDragStart, isDragging, onChangePriori
       </p>
       <p className="mb-3 text-xs text-gray-400">{task.project}</p>
 
-      <div className="flex items-center gap-1.5 text-xs text-gray-400">
+      <div className="mb-3 flex items-center gap-1.5 text-xs text-gray-400">
         <Calendar size={12} />
         {task.dueDate}
       </div>
+
+      {/* Submission stamp, once submitted */}
+      {task.submission && (
+        <div className="mb-3 rounded-lg bg-gray-50 px-2.5 py-2 text-xs text-gray-600">
+          <p className="font-medium text-gray-700">
+            Submitted {task.submission.submittedAt}
+          </p>
+          <p className="mt-0.5 text-gray-500">{task.submission.note}</p>
+          {task.submission.fileName && (
+            <p className="mt-1 flex items-center gap-1 text-gray-400">
+              <FileText size={11} />
+              {task.submission.fileName}
+            </p>
+          )}
+        </div>
+      )}
+
+      {/* Action row */}
+      {canSubmit && (
+        <button
+          onClick={() => onOpenSubmit(task)}
+          className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-blue-200 bg-blue-50 py-1.5 text-xs font-semibold text-blue-600 hover:bg-blue-100"
+        >
+          <Send size={12} />
+          Submit
+        </button>
+      )}
+
+      {task.status === "Review" && canReview && (
+        <div className="flex gap-2">
+          <button
+            onClick={() => onApprove(task.id)}
+            className="flex flex-1 items-center justify-center gap-1 rounded-lg bg-emerald-50 py-1.5 text-xs font-semibold text-emerald-600 hover:bg-emerald-100"
+          >
+            <Check size={12} />
+            Approve
+          </button>
+          <button
+            onClick={() => onRequestChanges(task.id)}
+            className="flex flex-1 items-center justify-center gap-1 rounded-lg bg-amber-50 py-1.5 text-xs font-semibold text-amber-600 hover:bg-amber-100"
+          >
+            <RotateCcw size={12} />
+            Changes
+          </button>
+        </div>
+      )}
     </div>
   );
 }
