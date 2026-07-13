@@ -1,10 +1,10 @@
 import { Plus } from "lucide-react";
-import { useAuth } from "../../context/AuthContext";
+import { useWorkspace } from "../../context/WorkspaceContext";
 import { hasPermission } from "../../data/permissions";
 
 export default function MembersHeader({ total, onAddMember }) {
-  const { user } = useAuth();
-  const canAdd = hasPermission(user?.role, "canAddMember");
+  const { currentRole } = useWorkspace();
+  const canAdd = hasPermission(currentRole, "canAddMember");
 
   return (
     <div className="mb-7 flex items-start justify-between">

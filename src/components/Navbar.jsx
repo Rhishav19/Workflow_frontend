@@ -9,10 +9,12 @@ import {
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useWorkspace } from "../context/WorkspaceContext";
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const { user, logout } = useAuth();
+  const { currentRole } = useWorkspace();
   const navigate = useNavigate();
 
   function handleLogout() {
@@ -23,7 +25,6 @@ const Navbar = () => {
 
   return (
     <header className="bg-white shadow-sm px-8 py-4 flex justify-between items-center">
-
       <div className="relative w-96">
         <Search size={18} className="absolute left-3 top-3 text-gray-400" />
         <input
@@ -64,7 +65,7 @@ const Navbar = () => {
                   <p className="text-sm font-semibold text-gray-900">{user?.name}</p>
                   <p className="text-xs text-gray-400">{user?.email}</p>
                   <span className="mt-1 inline-block rounded-full bg-blue-50 px-2 py-0.5 text-[11px] font-medium text-blue-600">
-                    {user?.role}
+                    {currentRole}
                   </span>
                 </div>
 

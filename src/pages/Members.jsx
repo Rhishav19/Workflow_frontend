@@ -2,14 +2,21 @@ import { useMemo, useState } from "react";
 import MembersHeader from "../components/members/MembersHeader";
 import MembersToolbar from "../components/members/MembersToolbar";
 import MembersGrid from "../components/members/MembersGrid";
-import { members } from "../data/members";
+import MemberModal from "../components/members/MemberModal";
+import { members as initialMembers } from "../data/members";
+import { useWorkspace } from "../context/WorkspaceContext";
 
 export default function Members() {
+  const { workspaceId } = useWorkspace();
+  const [members, setMembers] = useState(initialMembers);
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState("All");
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editingMember, setEditingMember] = useState(null);
 
   const filtered = useMemo(() => {
     return members.filter((member) => {
+      const matchesWorkspace = member.workspaceId === workspaceId;
       const matchesFilter = filter === "All" || member.role === filter;
       const q = query.trim().toLowerCase();
       const matchesQuery =
@@ -17,20 +24,48 @@ export default function Members() {
         member.name.toLowerCase().includes(q) ||
         member.email.toLowerCase().includes(q) ||
         member.department.toLowerCase().includes(q);
-      return matchesFilter && matchesQuery;
+      return matchesWorkspace && matchesFilter && matchesQuery;
     });
-  }, [query, filter]);
+  }, [members, workspaceId, query, filter]);
+
+  function handleAddClick() {
+    setEditingMember(null);
+    setModalOpen(true);
+  }
+
+  function handleEditClick(member) {
+    setEditingMember(member);
+    setModalOpen(true);
+  }
+
+  function handleSave(memberData) {
+    setMembers((prev) => {
+      const exists = prev.some((m) => m.id === memberData.id);
+      if (exists) {
+        return prev.map((m) => (m.id === memberData.id ? { ...memberData, workspaceId } : m));
+      }
+      return [{ ...memberData, workspaceId }, ...prev];
+    });
+  }
 
   return (
     <div className="px-8 py-8">
-      <MembersHeader total={filtered.length} />
+      <MembersHeader total={filtered.length} onAddMember={handleAddClick} />
       <MembersToolbar
         query={query}
         onQueryChange={setQuery}
         activeFilter={filter}
         onFilterChange={setFilter}
       />
-      <MembersGrid members={filtered} />
+      <MembersGrid members={filtered} onEdit={handleEditClick} />
+
+      {modalOpen && (
+        <MemberModal
+          member={editingMember}
+          onClose={() => setModalOpen(false)}
+          onSave={handleSave}
+        />
+      )}
     </div>
   );
 }

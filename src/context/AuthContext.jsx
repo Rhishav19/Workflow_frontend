@@ -18,7 +18,6 @@ export function AuthProvider({ children }) {
   }, [user]);
 
   function login(account) {
-    // Strip the password before storing — no reason to keep it in state/localStorage.
     const { password, ...safeUser } = account;
     setUser(safeUser);
   }

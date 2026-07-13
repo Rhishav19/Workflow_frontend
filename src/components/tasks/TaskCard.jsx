@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Calendar, ChevronDown, Send, Check, RotateCcw, FileText } from "lucide-react";
 import { PRIORITY_STYLES } from "../../data/tasks";
-import { useAuth } from "../../context/AuthContext";
+import { useWorkspace } from "../../context/WorkspaceContext";
 import { hasPermission } from "../../data/permissions";
 
 const PRIORITIES = ["High", "Medium", "Low"];
@@ -16,8 +16,8 @@ export default function TaskCard({
   onRequestChanges,
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const { user } = useAuth();
-  const canReview = hasPermission(user?.role, "canReviewTask");
+  const { currentRole } = useWorkspace();
+  const canReview = hasPermission(currentRole, "canReviewTask");
 
   const canSubmit = task.status !== "Review" && task.status !== "Done";
 
@@ -79,7 +79,6 @@ export default function TaskCard({
         {task.dueDate}
       </div>
 
-      {/* Submission stamp, once submitted */}
       {task.submission && (
         <div className="mb-3 rounded-lg bg-gray-50 px-2.5 py-2 text-xs text-gray-600">
           <p className="font-medium text-gray-700">
@@ -95,7 +94,6 @@ export default function TaskCard({
         </div>
       )}
 
-      {/* Action row */}
       {canSubmit && (
         <button
           onClick={() => onOpenSubmit(task)}
