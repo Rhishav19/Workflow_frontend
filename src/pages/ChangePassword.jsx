@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { findAccount, updatePassword } from "../data/auth-mock";
 import { useAuth } from "../context/AuthContext";
+import { useWorkspace } from "../context/WorkspaceContext";
 
 function passwordIssues(value) {
   const issues = [];
@@ -15,7 +16,9 @@ export default function ChangePassword() {
   const navigate = useNavigate();
   const location = useLocation();
   const { login } = useAuth();
+  const { switchWorkspace } = useWorkspace();
   const email = location.state?.email;
+  const role = location.state?.role;
 
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
@@ -42,6 +45,11 @@ export default function ChangePassword() {
     updatePassword(email, password);
     const account = findAccount(email, password);
     login(account);
+
+    const matchingMembership =
+      account.memberships.find((m) => m.role === role) ?? account.memberships[0];
+    switchWorkspace(matchingMembership.workspaceId);
+
     navigate("/dashboard");
   }
 

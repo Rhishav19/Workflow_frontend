@@ -4,8 +4,10 @@ import DocsToolbar from "../components/docs/DocsToolbar";
 import DocsGrid from "../components/docs/DocsGrid";
 import UploadDocModal from "../components/docs/UploadDocModal";
 import { docs as initialDocs } from "../data/docs";
+import { useWorkspace } from "../context/WorkspaceContext";
 
 export default function Docs() {
+  const { workspaceId } = useWorkspace();
   const [docs, setDocs] = useState(initialDocs);
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("All");
@@ -13,18 +15,19 @@ export default function Docs() {
 
   const filtered = useMemo(() => {
     return docs.filter((doc) => {
+      const matchesWorkspace = doc.workspaceId === workspaceId;
       const matchesCategory = category === "All" || doc.category === category;
       const q = query.trim().toLowerCase();
       const matchesQuery =
         q === "" ||
         doc.title.toLowerCase().includes(q) ||
         doc.author.toLowerCase().includes(q);
-      return matchesCategory && matchesQuery;
+      return matchesWorkspace && matchesCategory && matchesQuery;
     });
-  }, [docs, query, category]);
+  }, [docs, workspaceId, query, category]);
 
   function handleUpload(newDoc) {
-    setDocs((prev) => [newDoc, ...prev]);
+    setDocs((prev) => [{ ...newDoc, workspaceId }, ...prev]);
   }
 
   return (

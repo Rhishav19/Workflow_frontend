@@ -1,10 +1,10 @@
 import { Plus } from "lucide-react";
-import { useAuth } from "../../context/AuthContext";
+import { useWorkspace } from "../../context/WorkspaceContext";
 import { hasPermission } from "../../data/permissions";
 
 export default function ProjectsHeader({ onNewProject }) {
-  const { user } = useAuth();
-  const canCreate = hasPermission(user?.role, "canCreateProject");
+  const { currentRole } = useWorkspace();
+  const canCreate = hasPermission(currentRole, "canCreateProject");
 
   return (
     <div className="mb-7 flex items-start justify-between">

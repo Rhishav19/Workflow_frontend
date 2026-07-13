@@ -1,24 +1,23 @@
-// Mock account store — replace with real backend calls once ready.
 export const mockAccounts = [
   {
     email: "alex.rivera@workflow.com",
     password: "Workflow123",
     name: "Alex Rivera",
-    role: "Admin",
+    memberships: [{ workspaceId: "ws-1", role: "Admin" }],
     mustChangePassword: false,
   },
   {
-    email: "sarah.chen@workflow.com",
+    email: "sarahchen@gmail.com",
     password: "Workflow123",
     name: "Sarah Chen",
-    role: "Manager",
+    memberships: [{ workspaceId: "ws-1", role: "Manager" }],
     mustChangePassword: false,
   },
   {
     email: "new.employee@workflow.com",
     password: "Temp4821",
     name: "New Employee",
-    role: "Employee",
+    memberships: [{ workspaceId: "ws-1", role: "Employee" }],
     mustChangePassword: true,
   },
 ];
@@ -41,17 +40,34 @@ export function updatePassword(email, newPassword) {
   }
 }
 
-// Used by an Admin, from inside the app, to create Employee/Manager accounts.
-export function createAccount({ name, email, role, department }) {
+export function createAccount({ name, email, role, department, workspaceId }) {
   const tempPassword = Math.random().toString(36).slice(-8);
+  const existing = mockAccounts.find(
+    (acc) => acc.email.toLowerCase() === email.toLowerCase()
+  );
+
+  if (existing) {
+    existing.memberships.push({ workspaceId, role });
+    return existing.password;
+  }
+
   const account = {
     email,
     password: tempPassword,
     name,
-    role,
     department,
+    memberships: [{ workspaceId, role }],
     mustChangePassword: true,
   };
   mockAccounts.push(account);
   return tempPassword;
+}
+
+export function addMembership(email, workspaceId, role) {
+  const account = mockAccounts.find(
+    (acc) => acc.email.toLowerCase() === email.toLowerCase()
+  );
+  if (account) {
+    account.memberships.push({ workspaceId, role });
+  }
 }

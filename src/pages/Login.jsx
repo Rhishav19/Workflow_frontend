@@ -2,10 +2,12 @@ import { useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { findAccount } from "../data/auth-mock";
 import { useAuth } from "../context/AuthContext";
+import { useWorkspace } from "../context/WorkspaceContext";
 
 export default function Login() {
   const navigate = useNavigate();
   const { login } = useAuth();
+  const { switchWorkspace } = useWorkspace();
   const [searchParams] = useSearchParams();
   const role = searchParams.get("role") || "Employee";
 
@@ -23,17 +25,19 @@ export default function Login() {
       return;
     }
 
-    if (account.role !== role) {
-      setError(`This account is registered as ${account.role}, not ${role}.`);
+    const matchingMembership = account.memberships.find((m) => m.role === role);
+    if (!matchingMembership) {
+      setError(`This account has no ${role} membership in any workspace.`);
       return;
     }
 
     if (account.mustChangePassword) {
-      navigate("/change-password", { state: { email: account.email } });
+      navigate("/change-password", { state: { email: account.email, role } });
       return;
     }
 
     login(account);
+    switchWorkspace(matchingMembership.workspaceId);
     navigate("/dashboard");
   }
 

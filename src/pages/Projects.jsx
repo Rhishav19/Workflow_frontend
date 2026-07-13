@@ -5,8 +5,10 @@ import ProjectsToolbar from "../components/projects/ProjectsToolbar";
 import ProjectsGrid from "../components/projects/ProjectsGrid";
 import NewProjectModal from "../components/projects/NewProjectModal";
 import { projects as initialProjects } from "../data/projects";
+import { useWorkspace } from "../context/WorkspaceContext";
 
 export default function Projects() {
+  const { workspaceId } = useWorkspace();
   const [projects, setProjects] = useState(initialProjects);
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState("All");
@@ -23,17 +25,18 @@ export default function Projects() {
 
   const filtered = useMemo(() => {
     return projects.filter((project) => {
+      const matchesWorkspace = project.workspaceId === workspaceId;
       const matchesFilter = filter === "All" || project.status === filter;
       const matchesQuery =
         query.trim() === "" ||
         project.name.toLowerCase().includes(query.toLowerCase()) ||
         project.department.toLowerCase().includes(query.toLowerCase());
-      return matchesFilter && matchesQuery;
+      return matchesWorkspace && matchesFilter && matchesQuery;
     });
-  }, [projects, query, filter]);
+  }, [projects, workspaceId, query, filter]);
 
   function handleCreate(newProject) {
-    setProjects((prev) => [newProject, ...prev]);
+    setProjects((prev) => [{ ...newProject, workspaceId }, ...prev]);
   }
 
   return (
@@ -48,10 +51,7 @@ export default function Projects() {
       <ProjectsGrid projects={filtered} />
 
       {modalOpen && (
-        <NewProjectModal
-          onClose={() => setModalOpen(false)}
-          onCreate={handleCreate}
-        />
+        <NewProjectModal onClose={() => setModalOpen(false)} onCreate={handleCreate} />
       )}
     </div>
   );
