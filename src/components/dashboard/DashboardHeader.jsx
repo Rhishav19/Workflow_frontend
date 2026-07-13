@@ -1,6 +1,11 @@
 import { Link } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+import { hasPermission } from "../../data/permissions";
 
 const DashboardHeader = () => {
+  const { user } = useAuth();
+  const canCreate = hasPermission(user?.role, "canCreateProject");
+
   return (
     <div className="flex justify-between items-center mb-8">
 
@@ -16,12 +21,14 @@ const DashboardHeader = () => {
 
       </div>
 
-      <Link
-        to="/projects?new=true"
-        className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold transition"
-      >
-        + Create New
-      </Link>
+      {canCreate && (
+        <Link
+          to="/dashboard/projects?new=true"
+          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold transition"
+        >
+          + Create New
+        </Link>
+      )}
 
     </div>
   );

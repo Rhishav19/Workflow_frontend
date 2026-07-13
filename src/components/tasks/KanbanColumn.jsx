@@ -16,6 +16,9 @@ export default function KanbanColumn({
   onDragOver,
   isDragOver,
   onChangePriority,
+  onOpenSubmit,
+  onApprove,
+  onRequestChanges,
 }) {
   return (
     <div
@@ -41,6 +44,9 @@ export default function KanbanColumn({
             onDragStart={onDragStart}
             isDragging={draggingId === task.id}
             onChangePriority={onChangePriority}
+            onOpenSubmit={onOpenSubmit}
+            onApprove={onApprove}
+            onRequestChanges={onRequestChanges}
           />
         ))}
         {tasks.length === 0 && (

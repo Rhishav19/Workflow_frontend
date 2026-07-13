@@ -2,7 +2,14 @@ import { useState } from "react";
 import KanbanColumn from "./KanbanColumn";
 import { columns } from "../../data/tasks";
 
-export default function KanbanBoard({ tasks, onMoveTask, onChangePriority }) {
+export default function KanbanBoard({
+  tasks,
+  onMoveTask,
+  onChangePriority,
+  onOpenSubmit,
+  onApprove,
+  onRequestChanges,
+}) {
   const [draggingId, setDraggingId] = useState(null);
   const [dragOverColumn, setDragOverColumn] = useState(null);
 
@@ -36,6 +43,9 @@ export default function KanbanBoard({ tasks, onMoveTask, onChangePriority }) {
           onDrop={handleDrop}
           isDragOver={dragOverColumn === column}
           onChangePriority={onChangePriority}
+          onOpenSubmit={onOpenSubmit}
+          onApprove={onApprove}
+          onRequestChanges={onRequestChanges}
         />
       ))}
     </div>
