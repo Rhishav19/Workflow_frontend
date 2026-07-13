@@ -1,6 +1,11 @@
 import { Plus } from "lucide-react";
+import { useAuth } from "../../context/AuthContext";
+import { hasPermission } from "../../data/permissions";
 
 export default function ProjectsHeader({ onNewProject }) {
+  const { user } = useAuth();
+  const canCreate = hasPermission(user?.role, "canCreateProject");
+
   return (
     <div className="mb-7 flex items-start justify-between">
       <div>
@@ -9,13 +14,15 @@ export default function ProjectsHeader({ onNewProject }) {
           Track progress across every active initiative.
         </p>
       </div>
-      <button
-        onClick={onNewProject}
-        className="flex h-11 items-center gap-1.5 rounded-lg bg-blue-600 px-4 text-[15px] font-medium text-white hover:bg-blue-700"
-      >
-        <Plus size={17} />
-        New Project
-      </button>
+      {canCreate && (
+        <button
+          onClick={onNewProject}
+          className="flex h-11 items-center gap-1.5 rounded-lg bg-blue-600 px-4 text-[15px] font-medium text-white hover:bg-blue-700"
+        >
+          <Plus size={17} />
+          New Project
+        </button>
+      )}
     </div>
   );
 }
