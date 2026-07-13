@@ -13,32 +13,32 @@ const menus = [
   {
     name: "Dashboard",
     icon: <LayoutDashboard size={20} />,
-    path: "/",
+    path: "/dashboard",
   },
   {
     name: "Projects",
     icon: <FolderKanban size={20} />,
-    path: "/projects",
+    path: "/dashboard/projects",
   },
   {
     name: "Tasks",
     icon: <CheckSquare size={20} />,
-    path: "/tasks",
+    path: "/dashboard/tasks",
   },
   {
     name: "Members",
     icon: <Users size={20} />,
-    path: "/members",
+    path: "/dashboard/members",
   },
   {
     name: "Docs",
     icon: <FileText size={20} />,
-    path: "/docs",
+    path: "/dashboard/docs",
   },
   {
     name: "Announcements",
     icon: <Megaphone size={20} />,
-    path: "/announcements",
+    path: "/dashboard/announcements",
   },
 ];
 
@@ -57,6 +57,7 @@ const Sidebar = () => {
           <NavLink
             key={menu.name}
             to={menu.path}
+            end={menu.path === "/dashboard"}
             className={({ isActive }) =>
               `flex items-center gap-3 px-6 py-4 transition-all ${
                 isActive
