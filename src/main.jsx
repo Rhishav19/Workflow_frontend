@@ -4,6 +4,8 @@ import { BrowserRouter } from "react-router-dom";
 import App from "./App.jsx";
 import { AuthProvider } from "./context/AuthContext.jsx";
 import { WorkspaceProvider } from "./context/WorkspaceContext.jsx";
+import { ProjectsProvider } from "./context/ProjectsContext.jsx";
+import { TasksProvider } from "./context/TasksContext.jsx";
 import "./index.css";
 
 createRoot(document.getElementById("root")).render(
@@ -11,7 +13,11 @@ createRoot(document.getElementById("root")).render(
     <BrowserRouter>
       <AuthProvider>
         <WorkspaceProvider>
-          <App />
+          <ProjectsProvider>
+            <TasksProvider>
+              <App />
+            </TasksProvider>
+          </ProjectsProvider>
         </WorkspaceProvider>
       </AuthProvider>
     </BrowserRouter>

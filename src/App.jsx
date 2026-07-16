@@ -15,12 +15,10 @@ import CreateAccount from "./pages/admin/CreateAccount";
 function App() {
   return (
     <Routes>
-      {/* Public */}
       <Route path="/" element={<Landing />} />
       <Route path="/login" element={<Login />} />
       <Route path="/change-password" element={<ChangePassword />} />
 
-      {/* Authenticated app */}
       <Route path="/dashboard" element={<Layout />}>
         <Route index element={<Dashboard />} />
         <Route path="projects" element={<Projects />} />

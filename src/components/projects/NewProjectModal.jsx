@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { X } from "lucide-react";
+import { formatDueDate } from "../../utils/formatDate";
 
 const STATUS_OPTIONS = ["Planning", "On Track", "At Risk", "Completed"];
 
@@ -26,7 +27,7 @@ export default function NewProjectModal({ onClose, onCreate }) {
       department: department.trim(),
       status,
       progress: 0,
-      dueDate: dueDate || "No date set",
+      dueDate: formatDueDate(dueDate),
       team: [],
       teamOverflow: 0,
     });
@@ -116,10 +117,9 @@ export default function NewProjectModal({ onClose, onCreate }) {
                 Due date
               </label>
               <input
-                type="text"
+                type="date"
                 value={dueDate}
                 onChange={(e) => setDueDate(e.target.value)}
-                placeholder="e.g. Nov 15"
                 className="h-10 w-full rounded-lg border border-gray-200 px-3 text-sm focus:border-blue-500 focus:outline-none"
               />
             </div>

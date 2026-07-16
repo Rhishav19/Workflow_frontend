@@ -4,12 +4,12 @@ import ProjectsHeader from "../components/projects/ProjectsHeader";
 import ProjectsToolbar from "../components/projects/ProjectsToolbar";
 import ProjectsGrid from "../components/projects/ProjectsGrid";
 import NewProjectModal from "../components/projects/NewProjectModal";
-import { projects as initialProjects } from "../data/projects";
+import { useProjects } from "../context/ProjectsContext";
 import { useWorkspace } from "../context/WorkspaceContext";
 
 export default function Projects() {
   const { workspaceId } = useWorkspace();
-  const [projects, setProjects] = useState(initialProjects);
+  const { projects, addProject } = useProjects();
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState("All");
   const [modalOpen, setModalOpen] = useState(false);
@@ -36,7 +36,7 @@ export default function Projects() {
   }, [projects, workspaceId, query, filter]);
 
   function handleCreate(newProject) {
-    setProjects((prev) => [{ ...newProject, workspaceId }, ...prev]);
+    addProject({ ...newProject, workspaceId });
   }
 
   return (
