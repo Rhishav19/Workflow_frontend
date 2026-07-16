@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Calendar, ChevronDown, Send, Check, RotateCcw, FileText } from "lucide-react";
 import { PRIORITY_STYLES } from "../../data/tasks";
+import { useProjects } from "../../context/ProjectsContext";
 import { useWorkspace } from "../../context/WorkspaceContext";
 import { hasPermission } from "../../data/permissions";
 
@@ -17,9 +18,10 @@ export default function TaskCard({
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const { currentRole } = useWorkspace();
+  const { projects } = useProjects();
   const canReview = hasPermission(currentRole, "canReviewTask");
-
   const canSubmit = task.status !== "Review" && task.status !== "Done";
+  const projectName = projects.find((p) => p.id === task.projectId)?.name ?? "Unknown project";
 
   return (
     <div
@@ -72,7 +74,7 @@ export default function TaskCard({
       <p className="mb-1 text-sm font-medium leading-snug text-gray-900">
         {task.title}
       </p>
-      <p className="mb-3 text-xs text-gray-400">{task.project}</p>
+      <p className="mb-3 text-xs text-gray-400">{projectName}</p>
 
       <div className="mb-3 flex items-center gap-1.5 text-xs text-gray-400">
         <Calendar size={12} />
