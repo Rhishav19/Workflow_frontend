@@ -1,12 +1,19 @@
 import { useState } from "react";
 import { X } from "lucide-react";
 import { columns } from "../../data/tasks";
+import { useProjects } from "../../context/ProjectsContext";
+import { useWorkspace } from "../../context/WorkspaceContext";
+import { formatDueDate } from "../../utils/formatDate";
 
 const PRIORITY_OPTIONS = ["High", "Medium", "Low"];
 
 export default function NewTaskModal({ onClose, onCreate }) {
+  const { workspaceId } = useWorkspace();
+  const { projects } = useProjects();
+  const workspaceProjects = projects.filter((p) => p.workspaceId === workspaceId);
+
   const [title, setTitle] = useState("");
-  const [project, setProject] = useState("");
+  const [projectId, setProjectId] = useState(workspaceProjects[0]?.id ?? "");
   const [assignee, setAssignee] = useState("");
   const [priority, setPriority] = useState("Medium");
   const [status, setStatus] = useState("To Do");
@@ -20,14 +27,18 @@ export default function NewTaskModal({ onClose, onCreate }) {
       setError("Task title and assignee are required.");
       return;
     }
+    if (!projectId) {
+      setError("Create a project first — tasks must belong to one.");
+      return;
+    }
 
     onCreate({
       id: `task-${Date.now()}`,
       title: title.trim(),
-      project: project.trim() || "Unassigned",
+      projectId,
       priority,
       assignee: assignee.trim().slice(0, 2).toUpperCase(),
-      dueDate: dueDate || "No date set",
+      dueDate: formatDueDate(dueDate),
       status,
     });
 
@@ -71,13 +82,23 @@ export default function NewTaskModal({ onClose, onCreate }) {
             <label className="mb-1.5 block text-sm font-medium text-gray-700">
               Project
             </label>
-            <input
-              type="text"
-              value={project}
-              onChange={(e) => setProject(e.target.value)}
-              placeholder="e.g. Project Alpha"
-              className="h-10 w-full rounded-lg border border-gray-200 px-3 text-sm focus:border-blue-500 focus:outline-none"
-            />
+            {workspaceProjects.length === 0 ? (
+              <p className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-700">
+                No projects yet in this workspace — create one first.
+              </p>
+            ) : (
+              <select
+                value={projectId}
+                onChange={(e) => setProjectId(e.target.value)}
+                className="h-10 w-full rounded-lg border border-gray-200 px-3 text-sm focus:border-blue-500 focus:outline-none"
+              >
+                {workspaceProjects.map((project) => (
+                  <option key={project.id} value={project.id}>
+                    {project.name}
+                  </option>
+                ))}
+              </select>
+            )}
           </div>
 
           <div>
@@ -135,10 +156,9 @@ export default function NewTaskModal({ onClose, onCreate }) {
               Due date
             </label>
             <input
-              type="text"
+              type="date"
               value={dueDate}
               onChange={(e) => setDueDate(e.target.value)}
-              placeholder="e.g. Oct 25"
               className="h-10 w-full rounded-lg border border-gray-200 px-3 text-sm focus:border-blue-500 focus:outline-none"
             />
           </div>
