@@ -1,27 +1,33 @@
 import { useState } from "react";
 import { X } from "lucide-react";
-import { createWorkspace } from "../data/workspaces";
-import { addMembership } from "../data/auth-mock";
+import { createWorkspace } from "../data/workspacesApi";
 import { useAuth } from "../context/AuthContext";
 import { useWorkspace } from "../context/WorkspaceContext";
 
 export default function CreateWorkspaceModal({ onClose }) {
   const { user } = useAuth();
-  const { switchWorkspace } = useWorkspace();
+  const { switchWorkspace, refreshMemberships } = useWorkspace();
   const [name, setName] = useState("");
   const [error, setError] = useState("");
+  const [saving, setSaving] = useState(false);
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
     if (!name.trim()) {
       setError("Workspace name is required.");
       return;
     }
 
-    const workspace = createWorkspace(name.trim(), user.email);
-    addMembership(user.email, workspace.id, "Admin");
-    user.memberships.push({ workspaceId: workspace.id, role: "Admin" });
+    setSaving(true);
+    const workspace = await createWorkspace(name.trim(), user.email);
+    setSaving(false);
 
+    if (!workspace) {
+      setError("Something went wrong creating the workspace.");
+      return;
+    }
+
+    await refreshMemberships();
     switchWorkspace(workspace.id);
     onClose();
   }
@@ -69,9 +75,10 @@ export default function CreateWorkspaceModal({ onClose }) {
             </button>
             <button
               type="submit"
-              className="h-10 rounded-lg bg-blue-600 px-4 text-sm font-medium text-white hover:bg-blue-700"
+              disabled={saving}
+              className="h-10 rounded-lg bg-blue-600 px-4 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-60"
             >
-              Create Workspace
+              {saving ? "Creating…" : "Create Workspace"}
             </button>
           </div>
         </form>

@@ -1,27 +1,36 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { useAuth } from "./AuthContext";
-import { getWorkspaceById } from "../data/workspaces";
+import { fetchMembershipsForEmail } from "../data/workspacesApi";
 
 const WorkspaceContext = createContext(null);
 const STORAGE_KEY = "workflow_workspace";
 
 export function WorkspaceProvider({ children }) {
   const { user } = useAuth();
+  const [memberships, setMemberships] = useState([]);
   const [workspaceId, setWorkspaceId] = useState(() =>
     localStorage.getItem(STORAGE_KEY)
   );
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!user?.memberships) {
+    if (!user?.email) {
+      setMemberships([]);
       setWorkspaceId(null);
+      setLoading(false);
       return;
     }
-    const belongsToCurrent = user.memberships.some(
-      (m) => m.workspaceId === workspaceId
-    );
-    if (!belongsToCurrent) {
-      setWorkspaceId(user.memberships[0]?.workspaceId ?? null);
-    }
+
+    setLoading(true);
+    fetchMembershipsForEmail(user.email).then((result) => {
+      setMemberships(result);
+
+      const belongsToCurrent = result.some((m) => m.workspaceId === workspaceId);
+      if (!belongsToCurrent) {
+        setWorkspaceId(result[0]?.workspaceId ?? null);
+      }
+      setLoading(false);
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
@@ -31,23 +40,39 @@ export function WorkspaceProvider({ children }) {
     }
   }, [workspaceId]);
 
-  const membership = user?.memberships?.find((m) => m.workspaceId === workspaceId);
+  const membership = memberships.find((m) => m.workspaceId === workspaceId);
   const currentRole = membership?.role ?? null;
-  const currentWorkspace = workspaceId ? getWorkspaceById(workspaceId) : null;
+  const currentWorkspace = membership
+    ? { id: membership.workspaceId, name: membership.name }
+    : null;
 
-  const myWorkspaces = user?.memberships
-    ? user.memberships
-        .map((m) => ({ ...getWorkspaceById(m.workspaceId), role: m.role }))
-        .filter((w) => w.id)
-    : [];
+  const myWorkspaces = memberships.map((m) => ({
+    id: m.workspaceId,
+    name: m.name,
+    role: m.role,
+  }));
 
   function switchWorkspace(id) {
     setWorkspaceId(id);
   }
 
+  async function refreshMemberships() {
+    if (!user?.email) return;
+    const result = await fetchMembershipsForEmail(user.email);
+    setMemberships(result);
+  }
+
   return (
     <WorkspaceContext.Provider
-      value={{ workspaceId, currentWorkspace, currentRole, myWorkspaces, switchWorkspace }}
+      value={{
+        workspaceId,
+        currentWorkspace,
+        currentRole,
+        myWorkspaces,
+        switchWorkspace,
+        refreshMemberships,
+        loading,
+      }}
     >
       {children}
     </WorkspaceContext.Provider>

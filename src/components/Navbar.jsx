@@ -1,7 +1,6 @@
 import { useState } from "react";
 import {
   Bell,
-  Search,
   Settings,
   User,
   LogOut,
@@ -10,6 +9,7 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useWorkspace } from "../context/WorkspaceContext";
+import SearchDropdown from "./SearchDropdown";
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -25,14 +25,7 @@ const Navbar = () => {
 
   return (
     <header className="bg-white shadow-sm px-8 py-4 flex justify-between items-center">
-      <div className="relative w-96">
-        <Search size={18} className="absolute left-3 top-3 text-gray-400" />
-        <input
-          type="text"
-          placeholder="Search..."
-          className="w-full pl-10 pr-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
-        />
-      </div>
+      <SearchDropdown />
 
       <div className="flex items-center gap-5">
         <Bell className="cursor-pointer" />

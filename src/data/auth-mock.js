@@ -3,21 +3,18 @@ export const mockAccounts = [
     email: "alex.rivera@workflow.com",
     password: "Workflow123",
     name: "Alex Rivera",
-    memberships: [{ workspaceId: "ws-1", role: "Admin" }],
     mustChangePassword: false,
   },
   {
-    email: "sarahchen@gmail.com",
+    email: "sarah.chen@workflow.com",
     password: "Workflow123",
     name: "Sarah Chen",
-    memberships: [{ workspaceId: "ws-1", role: "Manager" }],
     mustChangePassword: false,
   },
   {
     email: "new.employee@workflow.com",
     password: "Temp4821",
     name: "New Employee",
-    memberships: [{ workspaceId: "ws-1", role: "Employee" }],
     mustChangePassword: true,
   },
 ];
@@ -40,34 +37,23 @@ export function updatePassword(email, newPassword) {
   }
 }
 
-export function createAccount({ name, email, role, department, workspaceId }) {
+// Still mock — password/name storage. Real membership creation now
+// happens via Supabase in workspaces.js's createAccount-equivalent flow.
+export function createAccount({ name, email }) {
   const tempPassword = Math.random().toString(36).slice(-8);
   const existing = mockAccounts.find(
     (acc) => acc.email.toLowerCase() === email.toLowerCase()
   );
 
   if (existing) {
-    existing.memberships.push({ workspaceId, role });
     return existing.password;
   }
 
-  const account = {
+  mockAccounts.push({
     email,
     password: tempPassword,
     name,
-    department,
-    memberships: [{ workspaceId, role }],
     mustChangePassword: true,
-  };
-  mockAccounts.push(account);
+  });
   return tempPassword;
-}
-
-export function addMembership(email, workspaceId, role) {
-  const account = mockAccounts.find(
-    (acc) => acc.email.toLowerCase() === email.toLowerCase()
-  );
-  if (account) {
-    account.memberships.push({ workspaceId, role });
-  }
 }

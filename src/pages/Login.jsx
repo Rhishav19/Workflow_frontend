@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { findAccount } from "../data/auth-mock";
+import { fetchMembershipsForEmail } from "../data/workspacesApi";
 import { useAuth } from "../context/AuthContext";
 import { useWorkspace } from "../context/WorkspaceContext";
 
@@ -14,8 +15,9 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [checking, setChecking] = useState(false);
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
     setError("");
 
@@ -25,7 +27,11 @@ export default function Login() {
       return;
     }
 
-    const matchingMembership = account.memberships.find((m) => m.role === role);
+    setChecking(true);
+    const memberships = await fetchMembershipsForEmail(account.email);
+    setChecking(false);
+
+    const matchingMembership = memberships.find((m) => m.role === role);
     if (!matchingMembership) {
       setError(`This account has no ${role} membership in any workspace.`);
       return;
@@ -62,9 +68,7 @@ export default function Login() {
           )}
 
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-gray-700">
-              Email
-            </label>
+            <label className="mb-1.5 block text-sm font-medium text-gray-700">Email</label>
             <input
               type="email"
               value={email}
@@ -75,9 +79,7 @@ export default function Login() {
           </div>
 
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-gray-700">
-              Password
-            </label>
+            <label className="mb-1.5 block text-sm font-medium text-gray-700">Password</label>
             <input
               type="password"
               value={password}
@@ -89,9 +91,10 @@ export default function Login() {
 
           <button
             type="submit"
-            className="mt-2 h-10 rounded-lg bg-blue-600 text-sm font-medium text-white hover:bg-blue-700"
+            disabled={checking}
+            className="mt-2 h-10 rounded-lg bg-blue-600 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-60"
           >
-            Sign in
+            {checking ? "Checking…" : "Sign in"}
           </button>
         </form>
       </div>

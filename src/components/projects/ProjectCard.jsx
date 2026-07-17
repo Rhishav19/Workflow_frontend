@@ -1,9 +1,13 @@
+import { Link } from "react-router-dom";
 import { Calendar } from "lucide-react";
 import { STATUS_STYLES } from "../../data/projects";
 
 export default function ProjectCard({ project }) {
   return (
-    <div className="flex flex-col rounded-2xl border border-gray-200 bg-white p-5 transition-colors hover:border-blue-300">
+    <Link
+      to={`/dashboard/projects/${project.id}`}
+      className="flex flex-col rounded-2xl border border-gray-200 bg-white p-5 transition-colors hover:border-blue-300"
+    >
       <div className="mb-3 flex items-start justify-between gap-3">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">
@@ -61,6 +65,6 @@ export default function ProjectCard({ project }) {
           {project.dueDate}
         </div>
       </div>
-    </div>
+    </Link>
   );
 }

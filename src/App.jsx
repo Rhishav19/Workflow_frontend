@@ -5,6 +5,7 @@ import Login from "./pages/Login";
 import ChangePassword from "./pages/ChangePassword";
 import Dashboard from "./pages/Dashboard";
 import Projects from "./pages/Projects";
+import ProjectDetail from "./pages/ProjectDetail";
 import Tasks from "./pages/Tasks";
 import Members from "./pages/Members";
 import Docs from "./pages/Docs";
@@ -22,6 +23,7 @@ function App() {
       <Route path="/dashboard" element={<Layout />}>
         <Route index element={<Dashboard />} />
         <Route path="projects" element={<Projects />} />
+        <Route path="projects/:projectId" element={<ProjectDetail />} />
         <Route path="tasks" element={<Tasks />} />
         <Route path="members" element={<Members />} />
         <Route path="docs" element={<Docs />} />

@@ -1,52 +1,116 @@
-import { createContext, useContext, useState } from "react";
-import { initialTasks } from "../data/tasks";
+import { createContext, useContext, useEffect, useState } from "react";
+import { supabase } from "../lib/supabaseClient";
 
 const TasksContext = createContext(null);
 
 export function TasksProvider({ children }) {
-  const [tasks, setTasks] = useState(initialTasks);
+  const [tasks, setTasks] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  function addTask(task) {
+  useEffect(() => {
+    fetchTasks();
+  }, []);
+
+  async function fetchTasks() {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from("tasks")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Error fetching tasks:", error);
+    } else {
+      const mapped = data.map((t) => ({
+        id: t.id,
+        workspaceId: t.workspace_id,
+        projectId: t.project_id,
+        title: t.title,
+        priority: t.priority,
+        assignee: t.assignee,
+        dueDate: t.due_date,
+        status: t.status,
+        submission: t.submission,
+      }));
+      setTasks(mapped);
+    }
+    setLoading(false);
+  }
+
+  async function addTask(task) {
+    const { error } = await supabase.from("tasks").insert({
+      id: task.id,
+      workspace_id: task.workspaceId,
+      project_id: task.projectId,
+      title: task.title,
+      priority: task.priority,
+      assignee: task.assignee,
+      due_date: task.dueDate,
+      status: task.status,
+    });
+
+    if (error) {
+      console.error("Error creating task:", error);
+      return;
+    }
+
     setTasks((prev) => [task, ...prev]);
   }
 
-  function moveTask(taskId, newStatus) {
+  async function updateTask(taskId, updates) {
+    // updates is a partial object like { status: "Done" } or { priority: "High" }
+    const dbUpdates = {};
+    if ("status" in updates) dbUpdates.status = updates.status;
+    if ("priority" in updates) dbUpdates.priority = updates.priority;
+    if ("submission" in updates) dbUpdates.submission = updates.submission;
+
+    const { error } = await supabase
+      .from("tasks")
+      .update(dbUpdates)
+      .eq("id", taskId);
+
+    if (error) {
+      console.error("Error updating task:", error);
+      return;
+    }
+
     setTasks((prev) =>
-      prev.map((task) => (task.id === taskId ? { ...task, status: newStatus } : task))
+      prev.map((t) => (t.id === taskId ? { ...t, ...updates } : t))
     );
+  }
+
+  function moveTask(taskId, newStatus) {
+    updateTask(taskId, { status: newStatus });
   }
 
   function changePriority(taskId, newPriority) {
-    setTasks((prev) =>
-      prev.map((task) => (task.id === taskId ? { ...task, priority: newPriority } : task))
-    );
+    updateTask(taskId, { priority: newPriority });
   }
 
   function submitTask(taskId, submission) {
-    setTasks((prev) =>
-      prev.map((task) =>
-        task.id === taskId ? { ...task, status: "Review", submission } : task
-      )
-    );
+    updateTask(taskId, { status: "Review", submission });
   }
 
   function approveTask(taskId) {
-    setTasks((prev) =>
-      prev.map((task) => (task.id === taskId ? { ...task, status: "Done" } : task))
-    );
+    updateTask(taskId, { status: "Done" });
   }
 
   function requestChanges(taskId) {
-    setTasks((prev) =>
-      prev.map((task) =>
-        task.id === taskId ? { ...task, status: "In Progress", submission: null } : task
-      )
-    );
+    updateTask(taskId, { status: "In Progress", submission: null });
   }
 
   return (
     <TasksContext.Provider
-      value={{ tasks, addTask, moveTask, changePriority, submitTask, approveTask, requestChanges }}
+      value={{
+        tasks,
+        loading,
+        addTask,
+        moveTask,
+        changePriority,
+        submitTask,
+        approveTask,
+        requestChanges,
+      }}
     >
       {children}
     </TasksContext.Provider>
