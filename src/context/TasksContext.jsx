@@ -9,6 +9,21 @@ export function TasksProvider({ children }) {
 
   useEffect(() => {
     fetchTasks();
+
+    const channel = supabase
+      .channel("tasks-changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "tasks" },
+        () => {
+          fetchTasks();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   async function fetchTasks() {

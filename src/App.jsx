@@ -19,7 +19,6 @@ function App() {
       <Route path="/" element={<Landing />} />
       <Route path="/login" element={<Login />} />
       <Route path="/change-password" element={<ChangePassword />} />
-
       <Route path="/dashboard" element={<Layout />}>
         <Route index element={<Dashboard />} />
         <Route path="projects" element={<Projects />} />

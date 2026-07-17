@@ -9,6 +9,20 @@ export function ProjectsProvider({ children }) {
 
   useEffect(() => {
     fetchProjects();
+    const channel = supabase
+      .channel("projects-changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "projects" },
+        () => {
+          fetchProjects();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   async function fetchProjects() {
@@ -21,7 +35,6 @@ export function ProjectsProvider({ children }) {
     if (error) {
       console.error("Error fetching projects:", error);
     } else {
-      // Map DB column names (snake_case) to the shape the app already expects.
       const mapped = data.map((p) => ({
         id: p.id,
         workspaceId: p.workspace_id,
@@ -58,7 +71,6 @@ export function ProjectsProvider({ children }) {
       return;
     }
 
-    // Optimistic update — add locally right away instead of refetching everything.
     setProjects((prev) => [project, ...prev]);
   }
 
