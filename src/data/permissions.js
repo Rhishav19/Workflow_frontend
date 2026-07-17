@@ -4,6 +4,7 @@ export const PERMISSIONS = {
   canAddMember: ["Admin"],
   canReviewTask: ["Admin", "Manager"],
   canCreateAnnouncement: ["Admin", "Manager"],
+  canSubmitTask: ["Employee"],
 };
 
 export function hasPermission(role, permission) {

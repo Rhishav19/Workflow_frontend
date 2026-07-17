@@ -1,27 +1,11 @@
 const activities = [
   {
     id: 1,
-    user: "Sarah Chen",
-    action: "updated",
-    project: "Project Alpha",
-    time: "24 minutes ago",
-    department: "Product Design",
-  },
-  {
-    id: 2,
-    user: "David Miller",
-    action: "completed",
-    project: "Task #892",
-    time: "2 hours ago",
-    department: "Backend Engineering",
-  },
-  {
-    id: 3,
-    user: "Alex Rivera",
-    action: "created",
-    project: "Q4 Revenue Optimization",
-    time: "4 hours ago",
-    department: "Finance",
+    user: "",
+    action: "",
+    project: "",
+    time: "",
+    department: "",
   },
 ];
 
