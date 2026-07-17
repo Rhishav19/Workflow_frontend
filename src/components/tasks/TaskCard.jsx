@@ -20,7 +20,9 @@ export default function TaskCard({
   const { currentRole } = useWorkspace();
   const { projects } = useProjects();
   const canReview = hasPermission(currentRole, "canReviewTask");
-  const canSubmit = task.status !== "Review" && task.status !== "Done";
+  const canSubmitRole = hasPermission(currentRole, "canSubmitTask");
+  const canSubmit =
+    canSubmitRole && task.status !== "Review" && task.status !== "Done";
   const projectName = projects.find((p) => p.id === task.projectId)?.name ?? "Unknown project";
 
   return (

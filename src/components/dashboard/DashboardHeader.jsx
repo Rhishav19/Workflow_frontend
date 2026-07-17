@@ -10,7 +10,7 @@ const DashboardHeader = () => {
     <div className="flex justify-between items-center mb-8">
       <div>
         <h1 className="text-4xl font-bold text-gray-800">
-          Welcome Back 👋
+          Welcome Back
         </h1>
         <p className="text-gray-500 mt-2">
           Here's what's happening with your projects today.
