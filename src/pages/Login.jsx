@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { findAccount } from "../data/auth-mock";
+import { findAccount } from "../data/auth";
 import { fetchMembershipsForEmail } from "../data/workspacesApi";
 import { useAuth } from "../context/AuthContext";
 import { useWorkspace } from "../context/WorkspaceContext";
@@ -21,13 +21,14 @@ export default function Login() {
     e.preventDefault();
     setError("");
 
-    const account = findAccount(email, password);
+    setChecking(true);
+    const account = await findAccount(email, password);
     if (!account) {
+      setChecking(false);
       setError("Incorrect email or password.");
       return;
     }
 
-    setChecking(true);
     const memberships = await fetchMembershipsForEmail(account.email);
     setChecking(false);
 
@@ -95,6 +96,7 @@ export default function Login() {
             className="mt-2 h-10 rounded-lg bg-blue-600 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-60"
           >
             {checking ? "Checking…" : "Sign in"}
+
           </button>
         </form>
       </div>

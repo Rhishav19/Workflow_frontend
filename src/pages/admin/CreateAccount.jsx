@@ -1,15 +1,19 @@
 import { useState } from "react";
-import { createAccount } from "../../data/auth-mock";
+import { createAccount } from "../../data/auth";
+import { addMembership } from "../../data/workspacesApi";
+import { useWorkspace } from "../../context/WorkspaceContext";
 
 export default function CreateAccount() {
+  const { workspaceId } = useWorkspace();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("Employee");
   const [department, setDepartment] = useState("");
   const [result, setResult] = useState(null);
   const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
     setError("");
 
@@ -18,13 +22,21 @@ export default function CreateAccount() {
       return;
     }
 
-    const tempPassword = createAccount({
+    setSubmitting(true);
+
+    const tempPassword = await createAccount({
       name: name.trim(),
       email: email.trim(),
-      role,
-      department: department.trim(),
     });
 
+    if (!tempPassword) {
+      setSubmitting(false);
+      setError("Couldn't create the account. Try again.");
+      return;
+    }
+    await addMembership(email.trim(), workspaceId, role);
+
+    setSubmitting(false);
     setResult({ email, tempPassword });
     setName("");
     setEmail("");
@@ -87,9 +99,10 @@ export default function CreateAccount() {
 
           <button
             type="submit"
-            className="mt-2 h-10 rounded-lg bg-blue-600 text-sm font-medium text-white hover:bg-blue-700"
+            disabled={submitting}
+            className="mt-2 h-10 rounded-lg bg-blue-600 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-60"
           >
-            Generate Account
+            {submitting ? "Creating…" : "Generate Account"}
           </button>
         </form>
       </div>

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { findAccount, updatePassword } from "../data/auth-mock";
+import { findAccount, updatePassword } from "../data/auth";
 import { fetchMembershipsForEmail } from "../data/workspacesApi";
 import { useAuth } from "../context/AuthContext";
 import { useWorkspace } from "../context/WorkspaceContext";
@@ -43,8 +43,8 @@ export default function ChangePassword() {
       return;
     }
 
-    updatePassword(email, password);
-    const account = findAccount(email, password);
+    await updatePassword(email, password);
+    const account = await findAccount(email, password);
     login(account);
 
     const memberships = await fetchMembershipsForEmail(email);
