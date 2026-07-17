@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { findAccount, updatePassword } from "../data/auth-mock";
+import { fetchMembershipsForEmail } from "../data/workspacesApi";
 import { useAuth } from "../context/AuthContext";
 import { useWorkspace } from "../context/WorkspaceContext";
 
@@ -29,7 +30,7 @@ export default function ChangePassword() {
     return null;
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
 
     const issues = passwordIssues(password);
@@ -46,9 +47,12 @@ export default function ChangePassword() {
     const account = findAccount(email, password);
     login(account);
 
+    const memberships = await fetchMembershipsForEmail(email);
     const matchingMembership =
-      account.memberships.find((m) => m.role === role) ?? account.memberships[0];
-    switchWorkspace(matchingMembership.workspaceId);
+      memberships.find((m) => m.role === role) ?? memberships[0];
+    if (matchingMembership) {
+      switchWorkspace(matchingMembership.workspaceId);
+    }
 
     navigate("/dashboard");
   }
@@ -69,9 +73,7 @@ export default function ChangePassword() {
           )}
 
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-gray-700">
-              New password
-            </label>
+            <label className="mb-1.5 block text-sm font-medium text-gray-700">New password</label>
             <input
               type="password"
               value={password}
@@ -81,9 +83,7 @@ export default function ChangePassword() {
           </div>
 
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-gray-700">
-              Confirm password
-            </label>
+            <label className="mb-1.5 block text-sm font-medium text-gray-700">Confirm password</label>
             <input
               type="password"
               value={confirm}

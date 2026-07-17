@@ -1,16 +1,14 @@
 import { useState } from "react";
 import { Building2, ChevronDown, Plus, Check } from "lucide-react";
 import { useWorkspace } from "../context/WorkspaceContext";
-import { useAuth } from "../context/AuthContext";
 import CreateWorkspaceModal from "./CreateWorkspaceModal";
 
 export default function WorkspaceSwitcher() {
   const { currentWorkspace, myWorkspaces, switchWorkspace } = useWorkspace();
-  const { user } = useAuth();
   const [open, setOpen] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
 
-  const isAdminSomewhere = user?.memberships.some((m) => m.role === "Admin");
+  const isAdminSomewhere = myWorkspaces.some((m) => m.role === "Admin");
 
   return (
     <div className="relative border-b border-gray-100 px-4 py-3">
