@@ -3,12 +3,12 @@ import MembersHeader from "../components/members/MembersHeader";
 import MembersToolbar from "../components/members/MembersToolbar";
 import MembersGrid from "../components/members/MembersGrid";
 import MemberModal from "../components/members/MemberModal";
-import { members as initialMembers } from "../data/members";
+import { useMembers } from "../context/MembersContext";
 import { useWorkspace } from "../context/WorkspaceContext";
 
 export default function Members() {
   const { workspaceId } = useWorkspace();
-  const [members, setMembers] = useState(initialMembers);
+  const { members, saveMember } = useMembers();
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState("All");
   const [modalOpen, setModalOpen] = useState(false);
@@ -39,13 +39,7 @@ export default function Members() {
   }
 
   function handleSave(memberData) {
-    setMembers((prev) => {
-      const exists = prev.some((m) => m.id === memberData.id);
-      if (exists) {
-        return prev.map((m) => (m.id === memberData.id ? { ...memberData, workspaceId } : m));
-      }
-      return [{ ...memberData, workspaceId }, ...prev];
-    });
+    saveMember({ ...memberData, workspaceId });
   }
 
   return (
