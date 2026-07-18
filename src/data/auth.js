@@ -66,3 +66,30 @@ export async function createAccount({ name, email }) {
 
   return tempPassword;
 }
+export async function registerAdminAccount({ name, email, password }) {
+  const normalizedEmail = email.trim().toLowerCase();
+
+  const { data: existing } = await supabase
+    .from("accounts")
+    .select("email")
+    .eq("email", normalizedEmail)
+    .maybeSingle();
+
+  if (existing) {
+    return { ok: false, reason: "An account with this email already exists." };
+  }
+
+  const { error } = await supabase.from("accounts").insert({
+    email: normalizedEmail,
+    name,
+    password,
+    must_change_password: false,
+  });
+
+  if (error) {
+    console.error("Error registering account:", error);
+    return { ok: false, reason: "Couldn't create the account. Try again." };
+  }
+
+  return { ok: true, account: { email: normalizedEmail, name, mustChangePassword: false } };
+}
