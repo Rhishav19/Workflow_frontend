@@ -1,5 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout";
+import ProtectedRoute from "./components/ProtectedRoute";
+import AdminRoute from "./components/AdminRoute";
 import Landing from "./pages/Landing";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
@@ -21,16 +23,20 @@ function App() {
       <Route path="/register" element={<Register />} />
       <Route path="/login" element={<Login />} />
       <Route path="/change-password" element={<ChangePassword />} />
-      <Route path="/dashboard" element={<Layout />}>
-        <Route index element={<Dashboard />} />
-        <Route path="projects" element={<Projects />} />
-        <Route path="projects/:projectId" element={<ProjectDetail />} />
-        <Route path="tasks" element={<Tasks />} />
-        <Route path="members" element={<Members />} />
-        <Route path="docs" element={<Docs />} />
-        <Route path="announcements" element={<Announcements />} />
-        <Route path="settings" element={<Settings />} />
-        <Route path="admin/create-account" element={<CreateAccount />} />
+      <Route element={<ProtectedRoute />}>
+        <Route path="/dashboard" element={<Layout />}>
+          <Route index element={<Dashboard />} />
+          <Route path="projects" element={<Projects />} />
+          <Route path="projects/:projectId" element={<ProjectDetail />} />
+          <Route path="tasks" element={<Tasks />} />
+          <Route path="members" element={<Members />} />
+          <Route path="docs" element={<Docs />} />
+          <Route path="announcements" element={<Announcements />} />
+          <Route path="settings" element={<Settings />} />
+          <Route element={<AdminRoute />}>
+            <Route path="admin/create-account" element={<CreateAccount />} />
+          </Route>
+        </Route>
       </Route>
     </Routes>
   );

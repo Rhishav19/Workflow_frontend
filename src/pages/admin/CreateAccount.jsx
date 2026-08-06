@@ -24,12 +24,12 @@ export default function CreateAccount() {
 
     setSubmitting(true);
 
-    const tempPassword = await createAccount({
+    const result = await createAccount({
       name: name.trim(),
       email: email.trim(),
     });
 
-    if (!tempPassword) {
+    if (!result) {
       setSubmitting(false);
       setError("Couldn't create the account. Try again.");
       return;
@@ -37,7 +37,11 @@ export default function CreateAccount() {
     await addMembership(email.trim(), workspaceId, role);
 
     setSubmitting(false);
-    setResult({ email, tempPassword });
+    setResult({
+      email,
+      tempPassword: result.tempPassword,
+      existed: result.existed,
+    });
     setName("");
     setEmail("");
     setDepartment("");
@@ -55,8 +59,19 @@ export default function CreateAccount() {
       <div className="max-w-sm rounded-2xl border border-gray-200 bg-white p-6">
         {result && (
           <div className="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 px-3.5 py-3 text-sm text-emerald-700">
-            Account created for <strong>{result.email}</strong>.<br />
-            Temporary password: <code className="font-mono">{result.tempPassword}</code>
+            {result.existed ? (
+              <>
+                <strong>{result.email}</strong> already had an account — added
+                them to this workspace. They can sign in with their existing
+                password.
+              </>
+            ) : (
+              <>
+                Account created for <strong>{result.email}</strong>.<br />
+                Temporary password:{" "}
+                <code className="font-mono">{result.tempPassword}</code>
+              </>
+            )}
           </div>
         )}
 
