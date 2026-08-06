@@ -76,6 +76,11 @@ export default function TaskCard({
       <p className="mb-1 text-sm font-medium leading-snug text-gray-900">
         {task.title}
       </p>
+      {task.description && (
+        <p className="mb-1.5 line-clamp-2 text-xs leading-snug text-gray-500">
+          {task.description}
+        </p>
+      )}
       <p className="mb-3 text-xs text-gray-400">{projectName}</p>
 
       <div className="mb-3 flex items-center gap-1.5 text-xs text-gray-400">
