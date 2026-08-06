@@ -1,31 +1,59 @@
 import { useState } from "react";
 import TasksHeader from "../components/tasks/TasksHeader";
 import KanbanBoard from "../components/tasks/KanbanBoard";
-import { initialTasks } from "../data/tasks";
+import NewTaskModal from "../components/tasks/NewTaskModal";
+import SubmitTaskModal from "../components/tasks/SubmitTaskModal";
+import { useTasks } from "../context/TasksContext";
+import { useWorkspace } from "../context/WorkspaceContext";
 
 export default function Tasks() {
-  const [tasks, setTasks] = useState(initialTasks);
+  const { workspaceId } = useWorkspace();
+  const {
+    tasks,
+    addTask,
+    moveTask,
+    changePriority,
+    submitTask,
+    approveTask,
+    requestChanges,
+    deleteTask,
+  } = useTasks();
+  const [modalOpen, setModalOpen] = useState(false);
+  const [submittingTask, setSubmittingTask] = useState(null);
 
-  function moveTask(taskId, newStatus) {
-    setTasks((prev) =>
-      prev.map((task) =>
-        task.id === taskId ? { ...task, status: newStatus } : task
-      )
-    );
-  }
+  const workspaceTasks = tasks.filter((t) => t.workspaceId === workspaceId);
 
-  function changePriority(taskId, newPriority) {
-    setTasks((prev) =>
-      prev.map((task) =>
-        task.id === taskId ? { ...task, priority: newPriority } : task
-      )
-    );
+  function handleCreate(newTask) {
+    addTask({ ...newTask, workspaceId });
   }
 
   return (
-    <div className="px-8 py-8">
-      <TasksHeader />
-      <KanbanBoard tasks={tasks} onMoveTask={moveTask} onChangePriority={changePriority} />
+    <div className="min-w-0 px-8 py-8">
+      <TasksHeader onNewTask={() => setModalOpen(true)} />
+      <KanbanBoard
+        tasks={workspaceTasks}
+        onMoveTask={moveTask}
+        onChangePriority={changePriority}
+        onOpenSubmit={setSubmittingTask}
+        onApprove={approveTask}
+        onRequestChanges={requestChanges}
+        onDelete={deleteTask}
+      />
+
+      {modalOpen && (
+        <NewTaskModal onClose={() => setModalOpen(false)} onCreate={handleCreate} />
+      )}
+
+      {submittingTask && (
+        <SubmitTaskModal
+          task={submittingTask}
+          onClose={() => setSubmittingTask(null)}
+          onSubmit={(taskId, submission) => {
+            submitTask(taskId, submission);
+            setSubmittingTask(null);
+          }}
+        />
+      )}
     </div>
   );
 }

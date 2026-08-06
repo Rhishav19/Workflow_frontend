@@ -2,7 +2,15 @@ import { useState } from "react";
 import KanbanColumn from "./KanbanColumn";
 import { columns } from "../../data/tasks";
 
-export default function KanbanBoard({ tasks, onMoveTask, onChangePriority }) {
+export default function KanbanBoard({
+  tasks,
+  onMoveTask,
+  onChangePriority,
+  onOpenSubmit,
+  onApprove,
+  onRequestChanges,
+  onDelete,
+}) {
   const [draggingId, setDraggingId] = useState(null);
   const [dragOverColumn, setDragOverColumn] = useState(null);
 
@@ -24,7 +32,7 @@ export default function KanbanBoard({ tasks, onMoveTask, onChangePriority }) {
   }
 
   return (
-    <div className="flex gap-4 overflow-x-auto pb-4">
+    <div className="flex min-w-0 flex-col gap-4 pb-4 md:flex-row md:overflow-x-auto">
       {columns.map((column) => (
         <KanbanColumn
           key={column}
@@ -36,6 +44,10 @@ export default function KanbanBoard({ tasks, onMoveTask, onChangePriority }) {
           onDrop={handleDrop}
           isDragOver={dragOverColumn === column}
           onChangePriority={onChangePriority}
+          onOpenSubmit={onOpenSubmit}
+          onApprove={onApprove}
+          onRequestChanges={onRequestChanges}
+          onDelete={onDelete}
         />
       ))}
     </div>

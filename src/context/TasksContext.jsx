@@ -2,9 +2,11 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 
 const TasksContext = createContext(null);
+
 export function TasksProvider({ children }) {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     fetchTasks();
 
@@ -114,6 +116,18 @@ export function TasksProvider({ children }) {
     updateTask(taskId, { status: "In Progress", submission: null });
   }
 
+  async function deleteTask(taskId) {
+    const { error } = await supabase.from("tasks").delete().eq("id", taskId);
+
+    if (error) {
+      console.error("Error deleting task:", error);
+      return { error };
+    }
+
+    setTasks((prev) => prev.filter((t) => t.id !== taskId));
+    return { error: null };
+  }
+
   return (
     <TasksContext.Provider
       value={{
@@ -125,6 +139,7 @@ export function TasksProvider({ children }) {
         submitTask,
         approveTask,
         requestChanges,
+        deleteTask,
       }}
     >
       {children}
