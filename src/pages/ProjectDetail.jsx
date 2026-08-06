@@ -1,15 +1,20 @@
+import { useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { ArrowLeft, Calendar, Users } from "lucide-react";
+import { ArrowLeft, Calendar, Users, ChevronDown, Trash2 } from "lucide-react";
 import { useProjects } from "../context/ProjectsContext";
 import { useTasks } from "../context/TasksContext";
 import { STATUS_STYLES } from "../data/projects";
 import { PRIORITY_STYLES } from "../data/tasks";
 
+const PROJECT_STATUSES = ["Planning", "On Track", "At Risk", "Completed"];
+
 export default function ProjectDetail() {
   const { projectId } = useParams();
   const navigate = useNavigate();
-  const { projects } = useProjects();
+  const { projects, updateProject, deleteProject } = useProjects();
   const { tasks } = useTasks();
+  const [statusMenuOpen, setStatusMenuOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const project = projects.find((p) => p.id === projectId);
   const projectTasks = tasks.filter((t) => t.projectId === projectId);
@@ -47,11 +52,64 @@ export default function ProjectDetail() {
           </p>
           <h1 className="mt-1 text-[32px] font-bold text-gray-900">{project.name}</h1>
         </div>
-        <span
-          className={`rounded-full px-3 py-1.5 text-sm font-semibold ${STATUS_STYLES[project.status]}`}
-        >
-          {project.status}
-        </span>
+        <div className="flex items-center gap-2">
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setStatusMenuOpen((open) => !open)}
+              className={`flex items-center gap-1 rounded-full px-3 py-1.5 text-sm font-semibold ${STATUS_STYLES[project.status]}`}
+            >
+              {project.status}
+              <ChevronDown size={14} />
+            </button>
+            {statusMenuOpen && (
+              <>
+                <div
+                  className="fixed inset-0 z-10"
+                  onClick={() => setStatusMenuOpen(false)}
+                />
+                <div className="absolute right-0 top-9 z-20 w-36 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-lg">
+                  {PROJECT_STATUSES.map((s) => (
+                    <button
+                      key={s}
+                      type="button"
+                      onClick={() => {
+                        updateProject(project.id, { status: s });
+                        setStatusMenuOpen(false);
+                      }}
+                      className={`block w-full px-3 py-1.5 text-left text-sm font-medium hover:bg-gray-50 ${
+                        s === project.status ? "text-blue-600" : "text-gray-600"
+                      }`}
+                    >
+                      {s}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+
+          <button
+            type="button"
+            disabled={deleting}
+            onClick={async () => {
+              if (!window.confirm(`Delete "${project.name}"? This can't be undone.`)) {
+                return;
+              }
+              setDeleting(true);
+              const { error } = await deleteProject(project.id);
+              if (!error) {
+                navigate("/dashboard/projects");
+              } else {
+                setDeleting(false);
+              }
+            }}
+            className="flex h-9 w-9 items-center justify-center rounded-full text-gray-400 hover:bg-red-50 hover:text-red-500 disabled:opacity-50"
+            aria-label="Delete project"
+          >
+            <Trash2 size={16} />
+          </button>
+        </div>
       </div>
 
       <p className="mb-6 max-w-2xl text-[15px] leading-relaxed text-gray-600">

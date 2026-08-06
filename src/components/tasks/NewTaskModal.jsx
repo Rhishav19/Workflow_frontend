@@ -13,12 +13,17 @@ export default function NewTaskModal({ onClose, onCreate }) {
   const workspaceProjects = projects.filter((p) => p.workspaceId === workspaceId);
 
   const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
   const [projectId, setProjectId] = useState(workspaceProjects[0]?.id ?? "");
   const [assignee, setAssignee] = useState("");
   const [priority, setPriority] = useState("Medium");
   const [status, setStatus] = useState("To Do");
   const [dueDate, setDueDate] = useState("");
   const [error, setError] = useState("");
+
+  // Local date, not UTC — avoids the day rolling back near midnight for users west of UTC.
+  const today = new Date();
+  const todayIso = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
 
   function handleSubmit(e) {
     e.preventDefault();
@@ -31,10 +36,15 @@ export default function NewTaskModal({ onClose, onCreate }) {
       setError("Create a project first — tasks must belong to one.");
       return;
     }
+    if (dueDate && dueDate < todayIso) {
+      setError("Due date can't be in the past.");
+      return;
+    }
 
     onCreate({
       id: `task-${Date.now()}`,
       title: title.trim(),
+      description: description.trim(),
       projectId,
       priority,
       assignee: assignee.trim().slice(0, 2).toUpperCase(),
@@ -75,6 +85,19 @@ export default function NewTaskModal({ onClose, onCreate }) {
               onChange={(e) => setTitle(e.target.value)}
               placeholder="e.g. Fix login redirect bug"
               className="h-10 w-full rounded-lg border border-gray-200 px-3 text-sm focus:border-blue-500 focus:outline-none"
+            />
+          </div>
+
+          <div>
+            <label className="mb-1.5 block text-sm font-medium text-gray-700">
+              Description
+            </label>
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="What needs to be done?"
+              rows={3}
+              className="w-full resize-none rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
             />
           </div>
 
@@ -158,6 +181,7 @@ export default function NewTaskModal({ onClose, onCreate }) {
             <input
               type="date"
               value={dueDate}
+              min={todayIso}
               onChange={(e) => setDueDate(e.target.value)}
               className="h-10 w-full rounded-lg border border-gray-200 px-3 text-sm focus:border-blue-500 focus:outline-none"
             />

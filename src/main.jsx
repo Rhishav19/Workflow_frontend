@@ -6,6 +6,7 @@ import { AuthProvider } from "./context/AuthContext.jsx";
 import { WorkspaceProvider } from "./context/WorkspaceContext.jsx";
 import { ProjectsProvider } from "./context/ProjectsContext.jsx";
 import { TasksProvider } from "./context/TasksContext.jsx";
+import { TimeTrackingProvider } from "./context/TimeTrackingContext.jsx";
 import { MembersProvider } from "./context/MembersContext.jsx";
 import "./index.css";
 
@@ -16,9 +17,11 @@ createRoot(document.getElementById("root")).render(
         <WorkspaceProvider>
           <ProjectsProvider>
             <TasksProvider>
-              <MembersProvider>
-                <App />
-              </MembersProvider>
+              <TimeTrackingProvider>
+                <MembersProvider>
+                  <App />
+                </MembersProvider>
+              </TimeTrackingProvider>
             </TasksProvider>
           </ProjectsProvider>
         </WorkspaceProvider>
