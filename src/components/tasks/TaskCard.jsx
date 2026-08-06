@@ -3,7 +3,6 @@ import { Calendar, ChevronDown } from "lucide-react";
 import { PRIORITY_STYLES } from "../../data/tasks";
 
 const PRIORITIES = ["High", "Medium", "Low"];
-
 export default function TaskCard({ task, onDragStart, isDragging, onChangePriority }) {
   const [menuOpen, setMenuOpen] = useState(false);
 
