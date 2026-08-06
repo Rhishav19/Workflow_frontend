@@ -7,6 +7,7 @@ import Dashboard from "./pages/Dashboard";
 import Projects from "./pages/Projects";
 import ProjectDetail from "./pages/ProjectDetail";
 import Tasks from "./pages/Tasks";
+import TimeTracking from "./pages/TimeTracking";
 import Members from "./pages/Members";
 import Docs from "./pages/Docs";
 import Announcements from "./pages/Announcements";
@@ -24,6 +25,7 @@ function App() {
         <Route path="projects" element={<Projects />} />
         <Route path="projects/:projectId" element={<ProjectDetail />} />
         <Route path="tasks" element={<Tasks />} />
+        <Route path="time-tracking" element={<TimeTracking />} />
         <Route path="members" element={<Members />} />
         <Route path="docs" element={<Docs />} />
         <Route path="announcements" element={<Announcements />} />
