@@ -9,6 +9,7 @@ export default function KanbanBoard({
   onOpenSubmit,
   onApprove,
   onRequestChanges,
+  onDelete,
 }) {
   const [draggingId, setDraggingId] = useState(null);
   const [dragOverColumn, setDragOverColumn] = useState(null);
@@ -46,6 +47,7 @@ export default function KanbanBoard({
           onOpenSubmit={onOpenSubmit}
           onApprove={onApprove}
           onRequestChanges={onRequestChanges}
+          onDelete={onDelete}
         />
       ))}
     </div>

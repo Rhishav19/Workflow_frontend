@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Calendar, ChevronDown, Send, Check, RotateCcw, FileText } from "lucide-react";
+import { Calendar, ChevronDown, Send, Check, RotateCcw, FileText, Trash2 } from "lucide-react";
 import { PRIORITY_STYLES } from "../../data/tasks";
 import { useProjects } from "../../context/ProjectsContext";
 import { useWorkspace } from "../../context/WorkspaceContext";
@@ -15,6 +15,7 @@ export default function TaskCard({
   onOpenSubmit,
   onApprove,
   onRequestChanges,
+  onDelete,
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const { currentRole } = useWorkspace();
@@ -68,8 +69,24 @@ export default function TaskCard({
           )}
         </div>
 
-        <div className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-50 text-[10px] font-semibold text-blue-600">
-          {task.assignee}
+        <div className="flex items-center gap-1.5">
+          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-50 text-[10px] font-semibold text-blue-600">
+            {task.assignee}
+          </div>
+          {onDelete && (
+            <button
+              type="button"
+              onClick={() => {
+                if (window.confirm(`Delete "${task.title}"?`)) {
+                  onDelete(task.id);
+                }
+              }}
+              className="flex h-6 w-6 items-center justify-center rounded-full text-gray-300 hover:bg-red-50 hover:text-red-500"
+              aria-label="Delete task"
+            >
+              <Trash2 size={13} />
+            </button>
+          )}
         </div>
       </div>
 
