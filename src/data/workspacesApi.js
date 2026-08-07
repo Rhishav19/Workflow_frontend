@@ -51,3 +51,17 @@ export async function addMembership(email, workspaceId, role) {
     console.error("Error adding membership:", error);
   }
 }
+// Creates the membership if it doesn't exist, or updates its role if it
+// does — relies on the unique (email, workspace_id) constraint.
+export async function upsertMembership(email, workspaceId, role) {
+  const { error } = await supabase
+    .from("memberships")
+    .upsert(
+      { email: email.toLowerCase(), workspace_id: workspaceId, role },
+      { onConflict: "email,workspace_id" }
+    );
+
+  if (error) {
+    console.error("Error upserting membership:", error);
+  }
+}
