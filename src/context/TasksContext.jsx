@@ -140,6 +140,7 @@ export function TasksProvider({ children }) {
         approveTask,
         requestChanges,
         deleteTask,
+        updateTask
       }}
     >
       {children}

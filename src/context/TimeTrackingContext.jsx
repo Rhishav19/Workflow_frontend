@@ -1,11 +1,13 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 import { useAuth } from "./AuthContext";
+import { useTasks } from "./TasksContext";
 
 const TimeTrackingContext = createContext(null);
 
 export function TimeTrackingProvider({ children }) {
   const { user } = useAuth();
+  const { updateTask } = useTasks();
   const [entries, setEntries] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -97,6 +99,11 @@ export function TimeTrackingProvider({ children }) {
       },
       ...prev,
     ]);
+
+    // Starting a timer always moves the task to "In Progress" — unconditionally,
+    // even if it was already "Review" or "Done". Stopping the timer does NOT
+    // move it back, since the work might just be paused, not finished.
+    updateTask(taskId, { status: "In Progress" });
   }
 
   async function stopTimer(entryId) {
