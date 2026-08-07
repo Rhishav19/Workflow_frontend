@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 import { useAuth } from "./AuthContext";
-
+//changes
 const TimeTrackingContext = createContext(null);
 
 export function TimeTrackingProvider({ children }) {

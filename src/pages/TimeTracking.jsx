@@ -7,6 +7,7 @@ import { useAuth } from "../context/AuthContext";
 import TimerTaskRow from "../components/Timetracking/TimerTaskRow";
 import { formatDuration } from "../utils/formatDuration";
 
+
 export default function TimeTracking() {
   const { workspaceId } = useWorkspace();
   const { user } = useAuth();

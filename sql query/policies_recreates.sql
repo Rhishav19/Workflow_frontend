@@ -1,6 +1,3 @@
--- Re-creates every RLS policy this app needs, dropping first so it's
--- safe to run even if some already exist and others don't.
-
 drop policy if exists "anon all workspaces" on workspaces;
 create policy "anon all workspaces" on workspaces for all to anon using (true) with check (true);
 
