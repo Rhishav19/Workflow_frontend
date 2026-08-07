@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { Calendar, ChevronDown, Send, Check, RotateCcw, FileText, Trash2 } from "lucide-react";
-import { PRIORITY_STYLES } from "../../data/tasks";
+import { columns, PRIORITY_STYLES } from "../../data/tasks";
 import { useProjects } from "../../context/ProjectsContext";
 import { useWorkspace } from "../../context/WorkspaceContext";
-import { hasPermission } from "../../data/permissions";
+import { hasPermission, canMoveTask } from "../../data/permissions";
 
 const PRIORITIES = ["High", "Medium", "Low"];
 
@@ -22,17 +22,22 @@ export default function TaskCard({
   const { projects } = useProjects();
   const canReview = hasPermission(currentRole, "canReviewTask");
   const canSubmitRole = hasPermission(currentRole, "canSubmitTask");
+  const canDelete = hasPermission(currentRole, "canDeleteTask");
   const canSubmit =
     canSubmitRole && task.status !== "Review" && task.status !== "Done";
   const projectName = projects.find((p) => p.id === task.projectId)?.name ?? "Unknown project";
+  const canDrag = columns.some(
+    (col) => col !== task.status && canMoveTask(currentRole, task.status, col)
+  );
 
   return (
     <div
-      draggable
-      onDragStart={(e) => onDragStart(e, task.id)}
-      className={`relative cursor-grab rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition-opacity active:cursor-grabbing ${
-        isDragging ? "opacity-40" : "opacity-100"
-      }`}
+      draggable={canDrag}
+      onDragStart={(e) => canDrag && onDragStart(e, task.id)}
+      title={!canDrag ? "You can't move this task from here" : undefined}
+      className={`relative rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition-opacity ${
+        canDrag ? "cursor-grab active:cursor-grabbing" : "cursor-default"
+      } ${isDragging ? "opacity-40" : "opacity-100"}`}
     >
       <div className="mb-2 flex items-center justify-between">
         <div className="relative">
@@ -73,7 +78,7 @@ export default function TaskCard({
           <div className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-50 text-[10px] font-semibold text-blue-600">
             {task.assignee}
           </div>
-          {onDelete && (
+          {canDelete && (
             <button
               type="button"
               onClick={() => {

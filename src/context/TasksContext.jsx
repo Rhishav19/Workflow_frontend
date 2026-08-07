@@ -75,7 +75,6 @@ export function TasksProvider({ children }) {
   }
 
   async function updateTask(taskId, updates) {
-    // updates is a partial object like { status: "Done" } or { priority: "High" }
     const dbUpdates = {};
     if ("status" in updates) dbUpdates.status = updates.status;
     if ("priority" in updates) dbUpdates.priority = updates.priority;
@@ -121,11 +120,10 @@ export function TasksProvider({ children }) {
 
     if (error) {
       console.error("Error deleting task:", error);
-      return { error };
+      return;
     }
 
     setTasks((prev) => prev.filter((t) => t.id !== taskId));
-    return { error: null };
   }
 
   return (
@@ -140,7 +138,6 @@ export function TasksProvider({ children }) {
         approveTask,
         requestChanges,
         deleteTask,
-        updateTask
       }}
     >
       {children}

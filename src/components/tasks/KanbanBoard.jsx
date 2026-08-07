@@ -1,6 +1,8 @@
 import { useState } from "react";
 import KanbanColumn from "./KanbanColumn";
 import { columns } from "../../data/tasks";
+import { useWorkspace } from "../../context/WorkspaceContext";
+import { canMoveTask } from "../../data/permissions";
 
 export default function KanbanBoard({
   tasks,
@@ -9,8 +11,8 @@ export default function KanbanBoard({
   onOpenSubmit,
   onApprove,
   onRequestChanges,
-  onDelete,
 }) {
+  const { currentRole } = useWorkspace();
   const [draggingId, setDraggingId] = useState(null);
   const [dragOverColumn, setDragOverColumn] = useState(null);
 
@@ -26,7 +28,13 @@ export default function KanbanBoard({
 
   function handleDrop(e, columnTitle) {
     e.preventDefault();
-    if (draggingId) onMoveTask(draggingId, columnTitle);
+    // Re-check permission at drop time — draggable={false} already stops
+    // most invalid drags, but this is the real gate since dataTransfer
+    // can't be trusted and this is what actually calls onMoveTask.
+    const task = tasks.find((t) => t.id === draggingId);
+    if (task && canMoveTask(currentRole, task.status, columnTitle)) {
+      onMoveTask(draggingId, columnTitle);
+    }
     setDraggingId(null);
     setDragOverColumn(null);
   }
@@ -47,7 +55,6 @@ export default function KanbanBoard({
           onOpenSubmit={onOpenSubmit}
           onApprove={onApprove}
           onRequestChanges={onRequestChanges}
-          onDelete={onDelete}
         />
       ))}
     </div>
