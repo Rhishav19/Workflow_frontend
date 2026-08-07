@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { User, Bell, Lock, Palette } from "lucide-react";
+import { useAuth } from "../context/AuthContext";
+import { useWorkspace } from "../context/WorkspaceContext";
 
 function Toggle({ checked, onChange }) {
   return (
@@ -37,8 +39,10 @@ function SettingsSection({ icon: Icon, title, description, children }) {
 }
 
 export default function Settings() {
-  const [name, setName] = useState("Alex Rivera");
-  const [email, setEmail] = useState("alex.rivera@workflow.com");
+  const { user, updateUser } = useAuth();
+  const { currentRole } = useWorkspace();
+
+  const [name, setName] = useState(user?.name ?? "");
   const [savedMessage, setSavedMessage] = useState("");
 
   const [emailNotifs, setEmailNotifs] = useState(true);
@@ -47,6 +51,7 @@ export default function Settings() {
 
   function handleProfileSave(e) {
     e.preventDefault();
+    updateUser({ name });
     setSavedMessage("Profile updated.");
     setTimeout(() => setSavedMessage(""), 2500);
   }
@@ -75,17 +80,17 @@ export default function Settings() {
             )}
 
             <div className="flex items-center gap-4">
-              <img
-                src="https://i.pravatar.cc/64"
-                alt="profile"
-                className="h-16 w-16 rounded-full"
-              />
-              <button
-                type="button"
-                className="rounded-lg border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-50"
-              >
-                Change photo
-              </button>
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-blue-50 text-lg font-semibold text-blue-600">
+                {user?.name
+                  ?.split(" ")
+                  .map((n) => n[0])
+                  .join("")
+                  .slice(0, 2)
+                  .toUpperCase()}
+              </div>
+              <span className="rounded-lg border border-dashed border-gray-200 px-3 py-1.5 text-sm text-gray-400">
+                Photo upload coming soon
+              </span>
             </div>
 
             <div>
@@ -106,9 +111,24 @@ export default function Settings() {
               </label>
               <input
                 type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="h-10 w-full rounded-lg border border-gray-200 px-3 text-sm focus:border-blue-500 focus:outline-none"
+                value={user?.email ?? ""}
+                disabled
+                className="h-10 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-sm text-gray-400"
+              />
+              <p className="mt-1 text-xs text-gray-400">
+                Email can't be changed here yet.
+              </p>
+            </div>
+
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-gray-700">
+                Role
+              </label>
+              <input
+                type="text"
+                value={currentRole ?? ""}
+                disabled
+                className="h-10 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-sm text-gray-400"
               />
             </div>
 
