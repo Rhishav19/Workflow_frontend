@@ -75,7 +75,6 @@ export function TasksProvider({ children }) {
   }
 
   async function updateTask(taskId, updates) {
-    // updates is a partial object like { status: "Done" } or { priority: "High" }
     const dbUpdates = {};
     if ("status" in updates) dbUpdates.status = updates.status;
     if ("priority" in updates) dbUpdates.priority = updates.priority;
@@ -116,6 +115,17 @@ export function TasksProvider({ children }) {
     updateTask(taskId, { status: "In Progress", submission: null });
   }
 
+  async function deleteTask(taskId) {
+    const { error } = await supabase.from("tasks").delete().eq("id", taskId);
+
+    if (error) {
+      console.error("Error deleting task:", error);
+      return;
+    }
+
+    setTasks((prev) => prev.filter((t) => t.id !== taskId));
+  }
+
   return (
     <TasksContext.Provider
       value={{
@@ -127,6 +137,7 @@ export function TasksProvider({ children }) {
         submitTask,
         approveTask,
         requestChanges,
+        deleteTask,
       }}
     >
       {children}

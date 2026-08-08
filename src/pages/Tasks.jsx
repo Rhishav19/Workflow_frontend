@@ -16,6 +16,7 @@ export default function Tasks() {
     submitTask,
     approveTask,
     requestChanges,
+    deleteTask,
   } = useTasks();
   const [modalOpen, setModalOpen] = useState(false);
   const [submittingTask, setSubmittingTask] = useState(null);
@@ -36,6 +37,7 @@ export default function Tasks() {
         onOpenSubmit={setSubmittingTask}
         onApprove={approveTask}
         onRequestChanges={requestChanges}
+        onDelete={deleteTask}
       />
 
       {modalOpen && (

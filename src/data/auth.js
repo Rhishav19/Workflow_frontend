@@ -1,5 +1,18 @@
 import { supabase } from "../lib/supabaseClient";
 
+export async function accountExists(email) {
+  const { data, error } = await supabase.rpc("account_exists", {
+    p_email: email.trim().toLowerCase(),
+  });
+
+  if (error) {
+    console.error("Error checking account existence:", error);
+    return false;
+  }
+
+  return Boolean(data);
+}
+
 export async function findAccount(email, password) {
   const { data, error } = await supabase
     .rpc("verify_login", {

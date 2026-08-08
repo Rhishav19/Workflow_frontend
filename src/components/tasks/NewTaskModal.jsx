@@ -6,7 +6,6 @@ import { useWorkspace } from "../../context/WorkspaceContext";
 import { formatDueDate } from "../../utils/formatDate";
 
 const PRIORITY_OPTIONS = ["High", "Medium", "Low"];
-
 export default function NewTaskModal({ onClose, onCreate }) {
   const { workspaceId } = useWorkspace();
   const { projects } = useProjects();

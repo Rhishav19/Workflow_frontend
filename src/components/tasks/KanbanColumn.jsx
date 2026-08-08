@@ -19,6 +19,7 @@ export default function KanbanColumn({
   onOpenSubmit,
   onApprove,
   onRequestChanges,
+  onDelete,
 }) {
   return (
     <div
@@ -47,6 +48,7 @@ export default function KanbanColumn({
             onOpenSubmit={onOpenSubmit}
             onApprove={onApprove}
             onRequestChanges={onRequestChanges}
+            onDelete={onDelete}
           />
         ))}
         {tasks.length === 0 && (
