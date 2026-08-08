@@ -85,9 +85,9 @@ const ExpenseList = ({ projects, expenses, filterProjectId }) => {
             </div>
 
             <div className="flex items-center gap-4 ml-4">
-              <span className="text-lg font-bold text-gray-800">
-                ${expense.amount.toLocaleString()}
-              </span>
+                <span className="text-lg font-bold text-gray-800">
+                  Rs. {expense.amount.toLocaleString()}
+                </span>
               <button
                 onClick={() => deleteExpense(expense.id)}
                 className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition opacity-0 group-hover:opacity-100"
