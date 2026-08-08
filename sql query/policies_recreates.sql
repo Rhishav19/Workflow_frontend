@@ -16,8 +16,6 @@ create policy "anon all tasks" on tasks for all to anon using (true) with check 
 drop policy if exists "Allow anon read accounts" on accounts;
 drop policy if exists "Allow anon insert accounts" on accounts;
 drop policy if exists "Allow anon update accounts" on accounts;
-drop policy if exists "anon all accounts" on accounts;
-create policy "anon all accounts" on accounts for all to anon using (true) with check (true);
 
 drop policy if exists "anon all time_entries" on time_entries;
 create policy "anon all time_entries" on time_entries for all to anon using (true) with check (true);
