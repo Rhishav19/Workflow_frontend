@@ -18,8 +18,9 @@ export default function Projects() {
   useEffect(() => {
     if (searchParams.get("new") === "true") {
       setModalOpen(true);
-      searchParams.delete("new");
-      setSearchParams(searchParams, { replace: true });
+      const nextParams = new URLSearchParams(searchParams);
+      nextParams.delete("new");
+      setSearchParams(nextParams, { replace: true });
     }
   }, [searchParams, setSearchParams]);
 

@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 
 const ProjectsContext = createContext(null);
@@ -6,6 +6,37 @@ const ProjectsContext = createContext(null);
 export function ProjectsProvider({ children }) {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const fetchProjects = useCallback(async function fetchProjects() {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from("projects")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Error fetching projects:", error);
+      setError(error.message);
+    } else {
+      const mapped = data.map((p) => ({
+        id: p.id,
+        workspaceId: p.workspace_id,
+        name: p.name,
+        description: p.description,
+        department: p.department,
+        status: p.status,
+        progress: p.progress,
+        dueDate: p.due_date,
+        team: p.team ?? [],
+        teamOverflow: p.team_overflow,
+        createdAt: p.created_at,
+      }));
+      setProjects(mapped);
+      setError(null);
+    }
+    setLoading(false);
+  }, []);
 
   useEffect(() => {
     fetchProjects();
@@ -23,34 +54,7 @@ export function ProjectsProvider({ children }) {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
-
-  async function fetchProjects() {
-    setLoading(true);
-    const { data, error } = await supabase
-      .from("projects")
-      .select("*")
-      .order("created_at", { ascending: false });
-
-    if (error) {
-      console.error("Error fetching projects:", error);
-    } else {
-      const mapped = data.map((p) => ({
-        id: p.id,
-        workspaceId: p.workspace_id,
-        name: p.name,
-        description: p.description,
-        department: p.department,
-        status: p.status,
-        progress: p.progress,
-        dueDate: p.due_date,
-        team: p.team ?? [],
-        teamOverflow: p.team_overflow,
-      }));
-      setProjects(mapped);
-    }
-    setLoading(false);
-  }
+  }, [fetchProjects]);
 
   async function addProject(project) {
     const { error } = await supabase.from("projects").insert({
@@ -71,7 +75,10 @@ export function ProjectsProvider({ children }) {
       return;
     }
 
-    setProjects((prev) => [project, ...prev]);
+    setProjects((prev) => [
+      { ...project, createdAt: new Date().toISOString() },
+      ...prev,
+    ]);
   }
 
   async function updateProject(projectId, updates) {
@@ -116,7 +123,7 @@ export function ProjectsProvider({ children }) {
 
   return (
     <ProjectsContext.Provider
-      value={{ projects, addProject, updateProject, deleteProject, loading }}
+      value={{ projects, addProject, updateProject, deleteProject, loading, error }}
     >
       {children}
     </ProjectsContext.Provider>

@@ -39,21 +39,21 @@ const Sidebar = () => {
       : menus;
 
   return (
-    <aside className="w-64 bg-white shadow-lg border-r">
-      <div className="text-2xl font-bold p-6 border-b">
+    <aside className="w-full border-b bg-white shadow-lg lg:min-h-screen lg:w-64 lg:border-b-0 lg:border-r">
+      <div className="border-b p-4 text-2xl font-bold lg:p-6">
         Workflow
       </div>
 
       <WorkspaceSwitcher />
 
-      <nav className="mt-4">
+      <nav className="mt-2 flex overflow-x-auto lg:mt-4 lg:block">
         {visibleMenus.map((menu) => (
           <NavLink
             key={menu.name}
             to={menu.path}
             end={menu.path === "/dashboard"}
             className={({ isActive }) =>
-              `flex items-center gap-3 px-6 py-4 transition-all ${
+              `flex shrink-0 items-center gap-2.5 px-4 py-3 text-sm transition-all lg:gap-3 lg:px-6 lg:py-4 lg:text-base ${
                 isActive ? "bg-blue-600 text-white" : "text-gray-700 hover:bg-gray-100"
               }`
             }

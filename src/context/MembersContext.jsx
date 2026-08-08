@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 import { accountExists, createAccount } from "../data/auth";
 import { upsertMembership } from "../data/workspacesApi";
@@ -8,12 +8,9 @@ const MembersContext = createContext(null);
 export function MembersProvider({ children }) {
   const [members, setMembers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  useEffect(() => {
-    fetchMembers();
-  }, []);
-
-  async function fetchMembers() {
+  const fetchMembers = useCallback(async function fetchMembers() {
     setLoading(true);
     const { data, error } = await supabase
       .from("members")
@@ -22,6 +19,7 @@ export function MembersProvider({ children }) {
 
     if (error) {
       console.error("Error fetching members:", error);
+      setError(error.message);
     } else {
       const mapped = data.map((m) => ({
         id: m.id,
@@ -33,11 +31,17 @@ export function MembersProvider({ children }) {
         role: m.role,
         status: m.status,
         joinedDate: m.joined_date,
+        createdAt: m.created_at,
       }));
       setMembers(mapped);
+      setError(null);
     }
     setLoading(false);
-  }
+  }, []);
+
+  useEffect(() => {
+    fetchMembers();
+  }, [fetchMembers]);
 
   async function saveMember(memberData) {
     const exists = members.some((m) => m.id === memberData.id);
@@ -79,14 +83,14 @@ export function MembersProvider({ children }) {
     setMembers((prev) =>
       exists
         ? prev.map((m) => (m.id === memberData.id ? memberData : m))
-        : [memberData, ...prev]
+        : [{ ...memberData, createdAt: new Date().toISOString() }, ...prev]
     );
 
     return { tempPassword, isNewAccount: !hadAccount };
   }
 
   return (
-    <MembersContext.Provider value={{ members, loading, saveMember }}>
+    <MembersContext.Provider value={{ members, loading, saveMember, error }}>
       {children}
     </MembersContext.Provider>
   );

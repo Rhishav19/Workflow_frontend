@@ -22,8 +22,11 @@ create policy "anon all accounts" on accounts for all to anon using (true) with 
 drop policy if exists "anon all time_entries" on time_entries;
 create policy "anon all time_entries" on time_entries for all to anon using (true) with check (true);
 
+drop policy if exists "anon all spending_entries" on spending_entries;
+create policy "anon all spending_entries" on spending_entries for all to anon using (true) with check (true);
+
 -- Verify every table now has at least one policy:
 select tablename, count(*) as policy_count
 from pg_policies
-where tablename in ('workspaces', 'memberships', 'projects', 'tasks', 'accounts', 'time_entries')
+where tablename in ('workspaces', 'memberships', 'projects', 'tasks', 'accounts', 'time_entries', 'spending_entries')
 group by tablename;

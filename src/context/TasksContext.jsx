@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 
 const TasksContext = createContext(null);
@@ -6,6 +6,37 @@ const TasksContext = createContext(null);
 export function TasksProvider({ children }) {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const fetchTasks = useCallback(async function fetchTasks() {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from("tasks")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Error fetching tasks:", error);
+      setError(error.message);
+    } else {
+      const mapped = data.map((t) => ({
+        id: t.id,
+        workspaceId: t.workspace_id,
+        projectId: t.project_id,
+        title: t.title,
+        description: t.description,
+        priority: t.priority,
+        assignee: t.assignee,
+        dueDate: t.due_date,
+        status: t.status,
+        submission: t.submission,
+        createdAt: t.created_at,
+      }));
+      setTasks(mapped);
+      setError(null);
+    }
+    setLoading(false);
+  }, []);
 
   useEffect(() => {
     fetchTasks();
@@ -24,34 +55,7 @@ export function TasksProvider({ children }) {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
-
-  async function fetchTasks() {
-    setLoading(true);
-    const { data, error } = await supabase
-      .from("tasks")
-      .select("*")
-      .order("created_at", { ascending: false });
-
-    if (error) {
-      console.error("Error fetching tasks:", error);
-    } else {
-      const mapped = data.map((t) => ({
-        id: t.id,
-        workspaceId: t.workspace_id,
-        projectId: t.project_id,
-        title: t.title,
-        description: t.description,
-        priority: t.priority,
-        assignee: t.assignee,
-        dueDate: t.due_date,
-        status: t.status,
-        submission: t.submission,
-      }));
-      setTasks(mapped);
-    }
-    setLoading(false);
-  }
+  }, [fetchTasks]);
 
   async function addTask(task) {
     const { error } = await supabase.from("tasks").insert({
@@ -71,7 +75,7 @@ export function TasksProvider({ children }) {
       return;
     }
 
-    setTasks((prev) => [task, ...prev]);
+    setTasks((prev) => [{ ...task, createdAt: new Date().toISOString() }, ...prev]);
   }
 
   async function updateTask(taskId, updates) {
@@ -137,7 +141,9 @@ export function TasksProvider({ children }) {
         submitTask,
         approveTask,
         requestChanges,
+        updateTask,
         deleteTask,
+        error,
       }}
     >
       {children}
