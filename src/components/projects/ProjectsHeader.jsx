@@ -1,6 +1,11 @@
 import { Plus } from "lucide-react";
+import { useWorkspace } from "../../context/WorkspaceContext";
+import { hasPermission } from "../../data/permissions";
 
-export default function ProjectsHeader() {
+export default function ProjectsHeader({ onNewProject }) {
+  const { currentRole } = useWorkspace();
+  const canCreate = hasPermission(currentRole, "canCreateProject");
+
   return (
     <div className="mb-7 flex items-start justify-between">
       <div>
@@ -9,10 +14,15 @@ export default function ProjectsHeader() {
           Track progress across every active initiative.
         </p>
       </div>
-      <button className="flex h-11 items-center gap-1.5 rounded-lg bg-blue-600 px-4 text-[15px] font-medium text-white hover:bg-blue-700">
-        <Plus size={17} />
-        New Project
-      </button>
+      {canCreate && (
+        <button
+          onClick={onNewProject}
+          className="flex h-11 items-center gap-1.5 rounded-lg bg-blue-600 px-4 text-[15px] font-medium text-white hover:bg-blue-700"
+        >
+          <Plus size={17} />
+          New Project
+        </button>
+      )}
     </div>
   );
 }

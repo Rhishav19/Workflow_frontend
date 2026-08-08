@@ -1,81 +1,57 @@
-const activities = [
-  {
-    id: 1,
-    user: "Sarah Chen",
-    action: "updated",
-    project: "Project Alpha",
-    time: "24 minutes ago",
-    department: "Product Design",
-  },
-  {
-    id: 2,
-    user: "David Miller",
-    action: "completed",
-    project: "Task #892",
-    time: "2 hours ago",
-    department: "Backend Engineering",
-  },
-  {
-    id: 3,
-    user: "Alex Rivera",
-    action: "created",
-    project: "Q4 Revenue Optimization",
-    time: "4 hours ago",
-    department: "Finance",
-  },
-];
+import { Link } from "react-router-dom";
+import { useActivity } from "../../context/ActivityContext";
+import { useWorkspace } from "../../context/WorkspaceContext";
+import { formatRelativeTime } from "../../utils/formattime";
+import { initialsFor } from "../../utils/initials";
 
 const RecentActivity = () => {
+  const { activities, loading } = useActivity();
+  const { workspaceId } = useWorkspace();
+
+  const scoped = activities.filter((a) => a.workspaceId === workspaceId);
+
   return (
     <div className="bg-white rounded-2xl shadow-md p-6">
-
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-bold">
-          Recent Activity
-        </h2>
-
-        <button className="text-blue-600 font-semibold">
+        <h2 className="text-xl font-bold">Recent Activity</h2>
+        <Link to="/dashboard/Activity" className="text-blue-600 font-semibold">
           View All
-        </button>
+        </Link>
       </div>
 
       <div className="space-y-6">
+        {loading && (
+          <p className="text-sm text-gray-400">Loading…</p>
+        )}
 
-        {activities.map((activity) => (
+        {!loading && scoped.length === 0 && (
+          <p className="text-sm text-gray-400">No recent activity yet.</p>
+        )}
 
-          <div
-            key={activity.id}
-            className="flex gap-4 items-start"
-          >
-            <img
-              src={`https://i.pravatar.cc/50?img=${activity.id + 10}`}
-              alt=""
-              className="w-12 h-12 rounded-full"
-            />
+        {scoped.slice(0, 6).map((activity) => (
+          <div key={activity.id} className="flex gap-4 items-start">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 text-sm font-semibold text-blue-700">
+              {initialsFor(activity.actor)}
+            </div>
 
             <div>
-
               <p className="text-gray-800">
-                <span className="font-bold">
-                  {activity.user}
-                </span>{" "}
-                {activity.action}{" "}
-                <span className="text-blue-600 font-semibold">
-                  {activity.project}
-                </span>
+                <span className="font-bold">{activity.actor}</span>{" "}
+                {activity.verb}{" "}
+                {activity.target && (
+                  <span className="text-blue-600 font-semibold">
+                    {activity.target}
+                  </span>
+                )}
               </p>
 
               <p className="text-sm text-gray-500 mt-1">
-                {activity.time} • {activity.department}
+                {formatRelativeTime(activity.createdAt)}
               </p>
-
             </div>
           </div>
-
         ))}
-
       </div>
-
     </div>
   );
 };

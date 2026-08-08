@@ -1,0 +1,95 @@
+export const roleFilters = ["All", "Manager", "Employee"];
+
+export const ROLE_STYLES = {
+  Manager: "bg-blue-50 text-blue-600",
+  Employee: "bg-gray-100 text-gray-600",
+};
+
+export const STATUS_STYLES = {
+  Active: "bg-emerald-500",
+  Away: "bg-amber-500",
+  Offline: "bg-gray-300",
+};
+
+export const members = [
+  {
+    id: "mem-1",
+    name: "Sarah Chen",
+    initials: "SC",
+    role: "Manager",
+    department: "Product Design",
+    email: "sarah.chen@workflow.com",
+    status: "Active",
+    joinedDate: "Jan 2024",
+  },
+  {
+    id: "mem-2",
+    name: "David Miller",
+    initials: "DM",
+    role: "Employee",
+    department: "Backend Engineering",
+    email: "david.miller@workflow.com",
+    status: "Active",
+    joinedDate: "Mar 2024",
+  },
+  {
+    id: "mem-3",
+    name: "Alex Rivera",
+    initials: "AR",
+    role: "Manager",
+    department: "Financial Operations",
+    email: "alex.rivera@workflow.com",
+    status: "Away",
+    joinedDate: "Nov 2023",
+  },
+  {
+    id: "mem-4",
+    name: "Tara Nguyen",
+    initials: "TN",
+    role: "Employee",
+    department: "Backend Engineering",
+    email: "tara.nguyen@workflow.com",
+    status: "Active",
+    joinedDate: "Jun 2024",
+  },
+  {
+    id: "mem-5",
+    name: "Jordan Kim",
+    initials: "JK",
+    role: "Employee",
+    department: "Growth",
+    email: "jordan.kim@workflow.com",
+    status: "Offline",
+    joinedDate: "Feb 2024",
+  },
+  {
+    id: "mem-6",
+    name: "Priya Sharma",
+    initials: "PS",
+    role: "Manager",
+    department: "Product Design",
+    email: "priya.sharma@workflow.com",
+    status: "Active",
+    joinedDate: "Sep 2023",
+  },
+  {
+    id: "mem-7",
+    name: "Leo Bennett",
+    initials: "LB",
+    role: "Employee",
+    department: "Growth",
+    email: "leo.bennett@workflow.com",
+    status: "Active",
+    joinedDate: "May 2024",
+  },
+  {
+    id: "mem-8",
+    name: "Maya Torres",
+    initials: "MT",
+    role: "Employee",
+    department: "Product Design",
+    email: "maya.torres@workflow.com",
+    status: "Away",
+    joinedDate: "Apr 2024",
+  },
+];

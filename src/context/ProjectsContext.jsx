@@ -1,13 +1,16 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
+import { createNotification } from "../data/notificationsApi";
 
 const ProjectsContext = createContext(null);
+
 export function ProjectsProvider({ children }) {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchProjects();
+
     const channel = supabase
       .channel("projects-changes")
       .on(
@@ -71,6 +74,12 @@ export function ProjectsProvider({ children }) {
     }
 
     setProjects((prev) => [project, ...prev]);
+
+    createNotification({
+      workspaceId: project.workspaceId,
+      type: "project_created",
+      message: `New project created: "${project.name}"`,
+    });
   }
 
   async function updateProject(projectId, updates) {
