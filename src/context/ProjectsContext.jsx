@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
+import { createNotification } from "../data/notificationsApi";
 
 const ProjectsContext = createContext(null);
 
@@ -9,20 +10,6 @@ export function ProjectsProvider({ children }) {
 
   useEffect(() => {
     fetchProjects();
-    const channel = supabase
-      .channel("projects-changes")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "projects" },
-        () => {
-          fetchProjects();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
   }, []);
 
   async function fetchProjects() {
@@ -72,52 +59,16 @@ export function ProjectsProvider({ children }) {
     }
 
     setProjects((prev) => [project, ...prev]);
-  }
 
-  async function updateProject(projectId, updates) {
-    // updates is a partial object like { status: "At Risk" } or { name: "..." }
-    const dbUpdates = {};
-    if ("name" in updates) dbUpdates.name = updates.name;
-    if ("description" in updates) dbUpdates.description = updates.description;
-    if ("department" in updates) dbUpdates.department = updates.department;
-    if ("status" in updates) dbUpdates.status = updates.status;
-    if ("progress" in updates) dbUpdates.progress = updates.progress;
-    if ("dueDate" in updates) dbUpdates.due_date = updates.dueDate;
-    if ("team" in updates) dbUpdates.team = updates.team;
-    if ("teamOverflow" in updates) dbUpdates.team_overflow = updates.teamOverflow;
-
-    const { error } = await supabase
-      .from("projects")
-      .update(dbUpdates)
-      .eq("id", projectId);
-
-    if (error) {
-      console.error("Error updating project:", error);
-      return { error };
-    }
-
-    setProjects((prev) =>
-      prev.map((p) => (p.id === projectId ? { ...p, ...updates } : p))
-    );
-    return { error: null };
-  }
-
-  async function deleteProject(projectId) {
-    const { error } = await supabase.from("projects").delete().eq("id", projectId);
-
-    if (error) {
-      console.error("Error deleting project:", error);
-      return { error };
-    }
-
-    setProjects((prev) => prev.filter((p) => p.id !== projectId));
-    return { error: null };
+    createNotification({
+      workspaceId: project.workspaceId,
+      type: "project_created",
+      message: `New project created: "${project.name}"`,
+    });
   }
 
   return (
-    <ProjectsContext.Provider
-      value={{ projects, addProject, updateProject, deleteProject, loading }}
-    >
+    <ProjectsContext.Provider value={{ projects, addProject, loading }}>
       {children}
     </ProjectsContext.Provider>
   );

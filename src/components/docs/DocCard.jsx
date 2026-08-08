@@ -1,10 +1,17 @@
 import { FileText, FileSpreadsheet } from "lucide-react";
 import { CATEGORY_STYLES } from "../../data/docs";
+import { formatRelativeTime } from "../../utils/formattime";
 
 export default function DocCard({ doc }) {
   const Icon = doc.fileType === "Sheet" ? FileSpreadsheet : FileText;
 
   return (
+    <a
+    href={doc.fileUrl}
+    target="_blank"
+    rel="noreferrer"
+    classname="flex flex-cool rounded-2x1 border boder-gray-200 bg-white p-5 transition-colors hover:border-blue-300"
+    >
     <div className="flex flex-col rounded-2xl border border-gray-200 bg-white p-5 transition-colors hover:border-blue-300">
       <div className="mb-4 flex items-start justify-between">
         <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gray-50 text-gray-500">
@@ -26,5 +33,6 @@ export default function DocCard({ doc }) {
         Updated {doc.updated}
       </div>
     </div>
+    </a>
   );
 }

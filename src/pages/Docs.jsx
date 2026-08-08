@@ -3,15 +3,21 @@ import DocsHeader from "../components/docs/DocsHeader";
 import DocsToolbar from "../components/docs/DocsToolbar";
 import DocsGrid from "../components/docs/DocsGrid";
 import UploadDocModal from "../components/docs/UploadDocModal";
-import { docs as initialDocs } from "../data/docs";
+import { useDocs } from "../context/DocsContext";
 import { useWorkspace } from "../context/WorkspaceContext";
+import { useAuth } from "../context/AuthContext";
+import { useActivity } from "../context/ActivityContext";
 
 export default function Docs() {
   const { workspaceId } = useWorkspace();
-  const [docs, setDocs] = useState(initialDocs);
+  const { user } = useAuth();
+  const { docs, uploadDoc } = useDocs();
+  const { logActivity } = useActivity();
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("All");
   const [modalOpen, setModalOpen] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState("");
 
   const filtered = useMemo(() => {
     return docs.filter((doc) => {
@@ -26,8 +32,33 @@ export default function Docs() {
     });
   }, [docs, workspaceId, query, category]);
 
-  function handleUpload(newDoc) {
-    setDocs((prev) => [{ ...newDoc, workspaceId }, ...prev]);
+  async function handleUpload({ file, title, category: docCategory }) {
+    setUploading(true);
+    setUploadError("");
+    const actor = user?.name ?? "Unknown";
+
+    const { error } = await uploadDoc({
+      file,
+      workspaceId,
+      title,
+      category: docCategory,
+      author: actor,
+    });
+
+    setUploading(false);
+
+    if (error) {
+      setUploadError("Upload failed. Please try again.");
+      return false;
+    }
+
+    logActivity({
+      workspaceId,
+      actor,
+      verb: "uploaded a document",
+      target: title,
+    });
+    return true;
   }
 
   return (
@@ -42,7 +73,15 @@ export default function Docs() {
       <DocsGrid docs={filtered} />
 
       {modalOpen && (
-        <UploadDocModal onClose={() => setModalOpen(false)} onUpload={handleUpload} />
+        <UploadDocModal
+          onClose={() => {
+            setModalOpen(false);
+            setUploadError("");
+          }}
+          onUpload={handleUpload}
+          uploading={uploading}
+          uploadError={uploadError}
+        />
       )}
     </div>
   );

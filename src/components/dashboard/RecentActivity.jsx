@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 const activities = [
   {
     id: 1,
@@ -8,6 +9,13 @@ const activities = [
     department: "",
   },
 ];
+=======
+import { Link } from "react-router-dom";
+import { useActivity } from "../../context/ActivityContext";
+import { useWorkspace } from "../../context/WorkspaceContext";
+import { formatRelativeTime } from "../../utils/formattime";
+import { initialsFor } from "../../utils/initials";
+>>>>>>> Stashed changes
 
 const RecentActivity = () => {
   return (

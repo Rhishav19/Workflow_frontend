@@ -7,6 +7,7 @@ import { useWorkspace } from "../context/WorkspaceContext";
 import { hasPermission } from "../data/permissions";
 import { STATUS_STYLES } from "../data/projects";
 import { PRIORITY_STYLES } from "../data/tasks";
+import { initialsFor } from "../utils/initials";
 
 const PROJECT_STATUSES = ["Planning", "On Track", "At Risk", "Completed"];
 
@@ -213,8 +214,11 @@ export default function ProjectDetail() {
               </div>
               <div className="flex items-center gap-3">
                 <span className="text-xs text-gray-400">{task.status}</span>
-                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-50 text-[10px] font-semibold text-blue-600">
-                  {task.assignee}
+                <div 
+                title={task.assignee}
+                className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-50 text-[10px] font-semibold text-blue-600"
+                 >
+                  {initialsFor(task.assignee)} 
                 </div>
               </div>
             </div>
