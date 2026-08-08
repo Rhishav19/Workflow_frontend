@@ -77,8 +77,30 @@ export function MembersProvider({ children }) {
     }
   }
 
+  async function removeMember(memberId, workspaceId, memberName) {
+    const { error } = await supabase
+      .from("members")
+      .delete()
+      .eq("id", memberId);
+
+    if (error) {
+      console.error("Error removing member:", error);
+      return false;
+    }
+
+    setMembers((prev) => prev.filter((m) => m.id !== memberId));
+
+    createNotification({
+      workspaceId,
+      type: "member_removed",
+      message: `${memberName} has been removed from the workspace`,
+    });
+
+    return true;
+  }
+
   return (
-    <MembersContext.Provider value={{ members, loading, saveMember }}>
+    <MembersContext.Provider value={{ members, loading, saveMember, removeMember }}>
       {children}
     </MembersContext.Provider>
   );

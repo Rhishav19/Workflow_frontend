@@ -23,7 +23,6 @@ export default function NewTaskModal({ onClose, onCreate }) {
   const [dueDate, setDueDate] = useState("");
   const [error, setError] = useState("");
 
-  // Local date, not UTC — avoids the day rolling back near midnight for users west of UTC.
   const today = new Date();
   const todayIso = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
 

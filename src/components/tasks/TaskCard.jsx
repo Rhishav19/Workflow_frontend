@@ -24,8 +24,7 @@ export default function TaskCard({
   const canReview = hasPermission(currentRole, "canReviewTask");
   const canSubmitRole = hasPermission(currentRole, "canSubmitTask");
   const canDelete = hasPermission(currentRole, "canDeleteTask");
-  const canSubmit =
-    canSubmitRole && task.status !== "Review" && task.status !== "Done";
+  const canSubmit = canSubmitRole && task.status === "In Progress";
   const projectName = projects.find((p) => p.id === task.projectId)?.name ?? "Unknown project";
   const canDrag = columns.some(
     (col) => col !== task.status && canMoveTask(currentRole, task.status, col)

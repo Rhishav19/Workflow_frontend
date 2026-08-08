@@ -145,6 +145,16 @@ export function TasksProvider({ children }) {
       });
     }
   }
+  async function deleteTask(taskId) {
+  const { error } = await supabase.from("tasks").delete().eq("id", taskId);
+
+  if (error) {
+    console.error("Error deleting task:", error);
+    return;
+  }
+
+  setTasks((prev) => prev.filter((t) => t.id !== taskId));
+}
 
   return (
     <TasksContext.Provider
@@ -158,6 +168,7 @@ export function TasksProvider({ children }) {
         submitTask,
         approveTask,
         requestChanges,
+        deleteTask,
       }}
     >
       {children}

@@ -11,7 +11,7 @@ import { useActivity } from "../context/ActivityContext";
 export default function Docs() {
   const { workspaceId } = useWorkspace();
   const { user } = useAuth();
-  const { docs, uploadDoc } = useDocs();
+  const { docs, uploadDoc, deleteDoc } = useDocs();
   const { logActivity } = useActivity();
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("All");
@@ -61,6 +61,10 @@ export default function Docs() {
     return true;
   }
 
+  function handleDelete(id, filePath) {
+    deleteDoc(id, filePath);
+  }
+
   return (
     <div className="px-8 py-8">
       <DocsHeader onUploadClick={() => setModalOpen(true)} />
@@ -70,7 +74,7 @@ export default function Docs() {
         activeCategory={category}
         onCategoryChange={setCategory}
       />
-      <DocsGrid docs={filtered} />
+      <DocsGrid docs={filtered} onDelete={handleDelete} />
 
       {modalOpen && (
         <UploadDocModal
