@@ -52,10 +52,14 @@ export default function Landing() {
         ))}
       </div>
 
-      <p className="mt-10 max-w-md text-center text-xs text-gray-400">
-        Employee and Manager accounts are created by an Admin. If you don't
-        have login details yet, contact your admin.
-      </p>
+    <p className="mt-10 max-w-md text-center text-xs text-gray-400">
+  Employee and Manager accounts are created by an Admin. If you don't
+  have login details yet, contact your admin — or{" "}
+  <Link to="/register" className="text-blue-600 hover:underline">
+    register a new company
+  </Link>
+  .
+</p>
     </div>
   );
 }
