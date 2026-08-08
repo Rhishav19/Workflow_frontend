@@ -16,6 +16,8 @@ import Docs from "./pages/Docs";
 import Announcements from "./pages/Announcements";
 import Settings from "./pages/Settings";
 import CreateAccount from "./pages/admin/CreateAccount";
+import AdminManagerRoute from "./components/AdminManagerRoute";
+import Budget from "./pages/Budget";
 
 function App() {
   return (
@@ -35,11 +37,17 @@ function App() {
           <Route path="docs" element={<Docs />} />
           <Route path="announcements" element={<Announcements />} />
           <Route path="settings" element={<Settings />} />
-          <Route element={<AdminRoute />}>
-            <Route path="admin/create-account" element={<CreateAccount />} />
+            {/* Budget — Admin & Manager only */}
+            <Route element={<AdminManagerRoute />}>
+              <Route path="/dashboard/budget" element={<Budget />} />
+            </Route>
+
+            {/* Admin-only routes */}
+            <Route element={<AdminRoute />}>
+              <Route path="/dashboard/admin/create-account" element={<CreateAccount />} />
+            </Route>
           </Route>
         </Route>
-      </Route>
     </Routes>
   );
 }

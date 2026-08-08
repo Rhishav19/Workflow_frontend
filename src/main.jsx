@@ -8,6 +8,7 @@ import { ProjectsProvider } from "./context/ProjectsContext.jsx";
 import { TasksProvider } from "./context/TasksContext.jsx";
 import { TimeTrackingProvider } from "./context/TimeTrackingContext.jsx";
 import { MembersProvider } from "./context/MembersContext.jsx";
+import { BudgetProvider } from "./context/BudgetContext.jsx";
 import "./index.css";
 
 createRoot(document.getElementById("root")).render(
@@ -19,7 +20,9 @@ createRoot(document.getElementById("root")).render(
             <TasksProvider>
               <TimeTrackingProvider>
                 <MembersProvider>
-                  <App />
+                  <BudgetProvider>
+                    <App />
+                  </BudgetProvider>
                 </MembersProvider>
               </TimeTrackingProvider>
             </TasksProvider>
