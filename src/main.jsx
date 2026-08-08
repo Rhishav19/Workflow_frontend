@@ -11,8 +11,8 @@ import { TimeTrackingProvider } from "./context/TimeTrackingContext.jsx";
 import { MembersProvider } from "./context/MembersContext.jsx";
 import { AnnouncementsProvider } from "./context/AnnouncementContext.jsx";
 import { DocsProvider } from "./context/DocsContext.jsx";
-import { ActivityProvider } from "./context/ActivityContext.jsx";
 import { NotificationsProvider } from "./context/NotificationsContext.jsx";
+import { OrgChartProvider } from "./context/OrgChartContext.jsx";
 
 import "./index.css";
 
@@ -29,7 +29,9 @@ createRoot(document.getElementById("root")).render(
                     <ActivityProvider>
                       <DocsProvider>
                         <NotificationsProvider>
-                          <App />
+                          <OrgChartProvider>
+                            <App />
+                          </OrgChartProvider>
                         </NotificationsProvider>
                       </DocsProvider>
                     </ActivityProvider>

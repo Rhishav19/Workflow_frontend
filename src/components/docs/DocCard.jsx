@@ -1,6 +1,5 @@
 import { FileText, FileSpreadsheet } from "lucide-react";
 import { CATEGORY_STYLES } from "../../data/docs";
-import { formatRelativeTime } from "../../utils/formattime";
 
 export default function DocCard({ doc }) {
   const Icon = doc.fileType === "Sheet" ? FileSpreadsheet : FileText;

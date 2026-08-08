@@ -1,26 +1,11 @@
-<<<<<<< Updated upstream
-const activities = [
-  {
-    id: 1,
-    user: "",
-    action: "",
-    project: "",
-    time: "",
-    department: "",
-  },
-];
-=======
-import { Link } from "react-router-dom";
-import { useActivity } from "../../context/ActivityContext";
-import { useWorkspace } from "../../context/WorkspaceContext";
-import { formatRelativeTime } from "../../utils/formattime";
+
 import { initialsFor } from "../../utils/initials";
->>>>>>> Stashed changes
 
 const RecentActivity = () => {
-  return (
-    <div className="bg-white rounded-2xl shadow-md p-6">
+  const { activities } = useActivity();
 
+  return (
+    <div>
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-bold">
           Recent Activity
@@ -32,9 +17,7 @@ const RecentActivity = () => {
       </div>
 
       <div className="space-y-6">
-
         {activities.map((activity) => (
-
           <div
             key={activity.id}
             className="flex gap-4 items-start"
@@ -46,7 +29,6 @@ const RecentActivity = () => {
             />
 
             <div>
-
               <p className="text-gray-800">
                 <span className="font-bold">
                   {activity.user}
@@ -60,14 +42,10 @@ const RecentActivity = () => {
               <p className="text-sm text-gray-500 mt-1">
                 {activity.time} • {activity.department}
               </p>
-
             </div>
           </div>
-
         ))}
-
       </div>
-
     </div>
   );
 };

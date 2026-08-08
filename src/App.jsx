@@ -15,6 +15,7 @@ import Members from "./pages/Members";
 import Docs from "./pages/Docs";
 import Announcements from "./pages/Announcements";
 import Settings from "./pages/Settings";
+import OrgChart from "./pages/OrgChart";
 import CreateAccount from "./pages/admin/CreateAccount";
 
 function App() {
@@ -35,6 +36,7 @@ function App() {
           <Route path="docs" element={<Docs />} />
           <Route path="announcements" element={<Announcements />} />
           <Route path="settings" element={<Settings />} />
+          <Route path="/dashboard/org-chart" element={<OrgChart />} />
           <Route element={<AdminRoute />}>
             <Route path="admin/create-account" element={<CreateAccount />} />
           </Route>
