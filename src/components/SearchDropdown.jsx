@@ -59,7 +59,7 @@ export default function SearchDropdown() {
   }
 
   return (
-    <div ref={inputRef} className="relative w-96">
+    <div ref={inputRef} className="relative w-full max-w-sm sm:w-96">
       <Search size={18} className="absolute left-3 top-3 text-gray-400" />
       <input
         type="text"

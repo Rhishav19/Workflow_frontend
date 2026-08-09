@@ -1,30 +1,12 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { supabase } from "../lib/supabaseClient.js";
+import { supabase } from "../lib/supabaseClient";
 
 const ProjectsContext = createContext(null);
 
 export function ProjectsProvider({ children }) {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetchProjects();
-
-    const channel = supabase
-      .channel("projects-changes")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "projects" },
-        () => {
-          fetchProjects();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, []);
+  const [error, setError] = useState(null);
 
   function mapFromDb(row) {
     return {
@@ -52,15 +34,36 @@ export function ProjectsProvider({ children }) {
 
     if (error) {
       console.error("Error fetching projects:", error);
+      setError(error.message);
       setLoading(false);
       return { error };
     }
 
     setProjects(data.map(mapFromDb));
+    setError(null);
     setLoading(false);
 
     return { error: null };
   }
+
+  useEffect(() => {
+    fetchProjects();
+
+    const channel = supabase
+      .channel("projects-changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "projects" },
+        () => {
+          fetchProjects();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
 
   async function addProject(newProject) {
     const dbProject = {
@@ -138,6 +141,7 @@ export function ProjectsProvider({ children }) {
   const value = {
     projects,
     loading,
+    error,
     fetchProjects,
     addProject,
     updateProject,

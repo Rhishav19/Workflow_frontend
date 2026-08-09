@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 import { createNotification } from "../data/notificationsApi";
 
@@ -7,12 +7,9 @@ const TasksContext = createContext(null);
 export function TasksProvider({ children }) {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  useEffect(() => {
-    fetchTasks();
-  }, []);
-
-  async function fetchTasks() {
+  const fetchTasks = useCallback(async function fetchTasks() {
     setLoading(true);
     const { data, error } = await supabase
       .from("tasks")
@@ -21,6 +18,7 @@ export function TasksProvider({ children }) {
 
     if (error) {
       console.error("Error fetching tasks:", error);
+      setError(error.message);
     } else {
       const mapped = data.map((t) => ({
         id: t.id,
@@ -32,11 +30,32 @@ export function TasksProvider({ children }) {
         dueDate: t.due_date,
         status: t.status,
         submission: t.submission,
+        createdAt: t.created_at,
       }));
       setTasks(mapped);
+      setError(null);
     }
     setLoading(false);
-  }
+  }, []);
+
+  useEffect(() => {
+    fetchTasks();
+
+    const channel = supabase
+      .channel("tasks-changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "tasks" },
+        () => {
+          fetchTasks();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [fetchTasks]);
 
   async function addTask(task) {
     const { error } = await supabase.from("tasks").insert({
@@ -55,7 +74,10 @@ export function TasksProvider({ children }) {
       return;
     }
 
-    setTasks((prev) => [task, ...prev]);
+    setTasks((prev) => [
+      { ...task, createdAt: task.createdAt ?? new Date().toISOString() },
+      ...prev,
+    ]);
 
     createNotification({
       workspaceId: task.workspaceId,
@@ -145,16 +167,17 @@ export function TasksProvider({ children }) {
       });
     }
   }
+
   async function deleteTask(taskId) {
-  const { error } = await supabase.from("tasks").delete().eq("id", taskId);
+    const { error } = await supabase.from("tasks").delete().eq("id", taskId);
 
-  if (error) {
-    console.error("Error deleting task:", error);
-    return;
+    if (error) {
+      console.error("Error deleting task:", error);
+      return;
+    }
+
+    setTasks((prev) => prev.filter((t) => t.id !== taskId));
   }
-
-  setTasks((prev) => prev.filter((t) => t.id !== taskId));
-}
 
   return (
     <TasksContext.Provider
@@ -169,6 +192,7 @@ export function TasksProvider({ children }) {
         approveTask,
         requestChanges,
         deleteTask,
+        error,
       }}
     >
       {children}

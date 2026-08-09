@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 import { useAuth } from "./AuthContext";
 import { useTasks } from "./TasksContext";
@@ -10,6 +10,36 @@ export function TimeTrackingProvider({ children }) {
   const { updateTask } = useTasks();
   const [entries, setEntries] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const fetchEntries = useCallback(async function fetchEntries() {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from("time_entries")
+      .select("*")
+      .order("start_time", { ascending: false });
+
+    if (error) {
+      console.error("Error fetching time entries:", error);
+      setError(error.message);
+    } else {
+      const mapped = data.map((e) => ({
+        id: e.id,
+        workspaceId: e.workspace_id,
+        taskId: e.task_id,
+        projectId: e.project_id,
+        userEmail: e.user_email,
+        userName: e.user_name,
+        startTime: e.start_time,
+        endTime: e.end_time,
+        durationSeconds: e.duration_seconds,
+        createdAt: e.created_at,
+      }));
+      setEntries(mapped);
+      setError(null);
+    }
+    setLoading(false);
+  }, []);
 
   useEffect(() => {
     fetchEntries();
@@ -28,33 +58,7 @@ export function TimeTrackingProvider({ children }) {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
-
-  async function fetchEntries() {
-    setLoading(true);
-    const { data, error } = await supabase
-      .from("time_entries")
-      .select("*")
-      .order("start_time", { ascending: false });
-
-    if (error) {
-      console.error("Error fetching time entries:", error);
-    } else {
-      const mapped = data.map((e) => ({
-        id: e.id,
-        workspaceId: e.workspace_id,
-        taskId: e.task_id,
-        projectId: e.project_id,
-        userEmail: e.user_email,
-        userName: e.user_name,
-        startTime: e.start_time,
-        endTime: e.end_time,
-        durationSeconds: e.duration_seconds,
-      }));
-      setEntries(mapped);
-    }
-    setLoading(false);
-  }
+  }, [fetchEntries]);
 
   // Starts a timer for a task. Refuses if the current user already has a
   // running timer (on this task or any other) so entries never overlap.
@@ -96,6 +100,7 @@ export function TimeTrackingProvider({ children }) {
         startTime: newEntry.start_time,
         endTime: null,
         durationSeconds: null,
+        createdAt: newEntry.start_time,
       },
       ...prev,
     ]);
@@ -162,6 +167,7 @@ export function TimeTrackingProvider({ children }) {
         getActiveEntry,
         getTotalSecondsForTask,
         getTotalSecondsForProject,
+        error,
       }}
     >
       {children}
