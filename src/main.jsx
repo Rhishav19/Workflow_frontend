@@ -8,6 +8,7 @@ import { ProjectsProvider } from "./context/ProjectsContext.jsx";
 import { TasksProvider } from "./context/TasksContext.jsx";
 import { TimeTrackingProvider } from "./context/TimeTrackingContext.jsx";
 import { MembersProvider } from "./context/MembersContext.jsx";
+import { BudgetProvider } from "./context/BudgetContext.jsx";
 import "./index.css";
 import { AnnouncementsProvider } from "./context/AnnouncementContext.jsx";
 import { DocsProvider } from "./context/DocsContext.jsx";

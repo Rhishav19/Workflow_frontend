@@ -7,6 +7,7 @@ import {
   FileText,
   Megaphone,
   UserPlus,
+  Wallet,
 } from "lucide-react";
 
 import { NavLink } from "react-router-dom";
@@ -14,56 +15,68 @@ import WorkspaceSwitcher from "./WorkspaceSwitcher";
 import { useWorkspace } from "../context/WorkspaceContext";
 
 const menus = [
-  { name: "Dashboard", icon: <LayoutDashboard size={20} />, path: "/dashboard" },
-  { name: "Projects", icon: <FolderKanban size={20} />, path: "/dashboard/projects" },
-  { name: "Tasks", icon: <CheckSquare size={20} />, path: "/dashboard/tasks" },
-  { name: "Time Tracking", icon: <Clock3 size={20} />, path: "/dashboard/time-tracking" },
-  { name: "Members", icon: <Users size={20} />, path: "/dashboard/members" },
-  { name: "Docs", icon: <FileText size={20} />, path: "/dashboard/docs" },
-  { name: "Announcements", icon: <Megaphone size={20} />, path: "/dashboard/announcements" },
+  { name: "Dashboard", icon: <LayoutDashboard />, path: "/dashboard" },
+  { name: "Projects", icon: <FolderKanban />, path: "/dashboard/projects" },
+  { name: "Tasks", icon: <CheckSquare />, path: "/dashboard/tasks" },
+  { name: "Time Tracking", icon: <Clock3 />, path: "/dashboard/time-tracking" },
+  { name: "Members", icon: <Users />, path: "/dashboard/members" },
+  { name: "Docs", icon: <FileText />, path: "/dashboard/docs" },
+  { name: "Announcements", icon: <Megaphone />, path: "/dashboard/announcements" },
 ];
 
 const Sidebar = () => {
   const { currentRole } = useWorkspace();
 
-  const visibleMenus =
-    currentRole === "Admin"
+  const isAdminOrManager = currentRole === "Admin" || currentRole === "Manager";
+
+  const visibleMenus = [
+    ...menus,
+    ...(isAdminOrManager
+      ? [{ name: "Budget", icon: <Wallet />, path: "/dashboard/budget" }]
+      : []),
+    ...(currentRole === "Admin"
       ? [
-          ...menus,
           {
             name: "Create Account",
-            icon: <UserPlus size={20} />,
+            icon: <UserPlus />,
             path: "/dashboard/admin/create-account",
           },
         ]
-      : menus;
+      : []),
+  ];
 
   return (
-    <aside className="w-64 bg-white shadow-lg border-r">
-      <div className="text-2xl font-bold p-6 border-b">
-        Workflow
+    <div className="w-64 bg-white h-screen border-r border-gray-200 flex flex-col p-4">
+      <div className="mb-8">
+        <WorkspaceSwitcher />
       </div>
 
-      <WorkspaceSwitcher />
-
-      <nav className="mt-4">
-        {visibleMenus.map((menu) => (
+      <nav className="flex-1 space-y-2">
+        {visibleMenus.map((item) => (
           <NavLink
-            key={menu.name}
-            to={menu.path}
-            end={menu.path === "/dashboard"}
+            key={item.name}
+            to={item.path}
             className={({ isActive }) =>
-              `flex items-center gap-3 px-6 py-4 transition-all ${
-                isActive ? "bg-blue-600 text-white" : "text-gray-700 hover:bg-gray-100"
+              `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition ${
+                isActive
+                  ? "bg-blue-600 text-white shadow-md"
+                  : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
               }`
             }
           >
-            {menu.icon}
-            <span>{menu.name}</span>
+            {({ isActive }) => (
+              <>
+                <span className={isActive ? "text-white" : "text-gray-400"}>
+                  {item.icon}
+                </span>
+                <span>{item.name}</span>
+              </>
+            )}
           </NavLink>
         ))}
       </nav>
-    </aside>
+    </div>
   );
 };
+
 export default Sidebar;
