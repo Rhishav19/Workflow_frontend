@@ -1,5 +1,15 @@
 import { useState } from "react";
-import { Calendar, ChevronDown, Send, Check, RotateCcw, FileText, Trash2 } from "lucide-react";
+import {
+  Calendar,
+  ChevronDown,
+  Send,
+  Check,
+  RotateCcw,
+  FileText,
+  Trash2,
+  MessageSquare,
+  StickyNote,
+} from "lucide-react";
 import { columns, PRIORITY_STYLES } from "../../data/tasks";
 import { useProjects } from "../../context/ProjectsContext";
 import { useWorkspace } from "../../context/WorkspaceContext";
@@ -24,8 +34,10 @@ export default function TaskCard({
   const canReview = hasPermission(currentRole, "canReviewTask");
   const canSubmitRole = hasPermission(currentRole, "canSubmitTask");
   const canDelete = hasPermission(currentRole, "canDeleteTask");
-  const canSubmit = canSubmitRole && task.status === "In Progress";
-  const projectName = projects.find((p) => p.id === task.projectId)?.name ?? "Unknown project";
+  const canSubmit =
+    canSubmitRole && task.status !== "Review" && task.status !== "Done";
+  const projectName =
+    projects.find((p) => p.id === task.projectId)?.name ?? "Unknown project";
   const canDrag = columns.some(
     (col) => col !== task.status && canMoveTask(currentRole, task.status, col)
   );
@@ -52,7 +64,10 @@ export default function TaskCard({
 
           {menuOpen && (
             <>
-              <div className="fixed inset-0 z-10" onClick={() => setMenuOpen(false)} />
+              <div
+                className="fixed inset-0 z-10"
+                onClick={() => setMenuOpen(false)}
+              />
               <div className="absolute left-0 top-7 z-20 w-28 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-lg">
                 {PRIORITIES.map((p) => (
                   <button
@@ -75,11 +90,11 @@ export default function TaskCard({
         </div>
 
         <div className="flex items-center gap-1.5">
-        <div 
-          title={task.assignee}
-          className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-50 text-[10px] font-semibold text-blue-600"
+          <div
+            title={task.assignee}
+            className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-50 text-[10px] font-semibold text-blue-600"
           >
-          {initialsFor(task.assignee)}  
+            {initialsFor(task.assignee)}
           </div>
           {canDelete && (
             <button
@@ -113,6 +128,7 @@ export default function TaskCard({
         {task.dueDate}
       </div>
 
+      {/* Employee submission */}
       {task.submission && (
         <div className="mb-3 rounded-lg bg-gray-50 px-2.5 py-2 text-xs text-gray-600">
           <p className="font-medium text-gray-700">
@@ -128,6 +144,29 @@ export default function TaskCard({
         </div>
       )}
 
+      {/* Changes requested */}
+      {task.changesNote && (
+        <div className="mb-3 rounded-lg bg-amber-50 px-2.5 py-2 text-xs text-amber-700">
+          <p className="flex items-center gap-1 font-semibold">
+            <MessageSquare size={11} />
+            Changes Requested
+          </p>
+          <p className="mt-0.5 text-amber-600">{task.changesNote}</p>
+        </div>
+      )}
+
+      {/* Manager/Admin change note */}
+      {task.changeNote && !task.changesNote && (
+        <div className="mb-3 rounded-lg bg-blue-50 px-2.5 py-2 text-xs text-blue-700">
+          <p className="flex items-center gap-1 font-semibold">
+            <StickyNote size={11} />
+            Note
+          </p>
+          <p className="mt-0.5 text-blue-600">{task.changeNote}</p>
+        </div>
+      )}
+
+      {/* Submit button */}
       {canSubmit && (
         <button
           onClick={() => onOpenSubmit(task)}
@@ -138,17 +177,18 @@ export default function TaskCard({
         </button>
       )}
 
+      {/* Review buttons */}
       {task.status === "Review" && canReview && (
         <div className="flex gap-2">
           <button
-            onClick={() => onApprove(task.id)}
+            onClick={() => onApprove(task)}
             className="flex flex-1 items-center justify-center gap-1 rounded-lg bg-emerald-50 py-1.5 text-xs font-semibold text-emerald-600 hover:bg-emerald-100"
           >
             <Check size={12} />
             Approve
           </button>
           <button
-            onClick={() => onRequestChanges(task.id)}
+            onClick={() => onRequestChanges(task)}
             className="flex flex-1 items-center justify-center gap-1 rounded-lg bg-amber-50 py-1.5 text-xs font-semibold text-amber-600 hover:bg-amber-100"
           >
             <RotateCcw size={12} />

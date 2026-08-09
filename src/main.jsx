@@ -28,7 +28,11 @@ createRoot(document.getElementById("root")).render(
                     <ActivityProvider>
                       <DocsProvider>
                         <NotificationsProvider>
-                          <App />
+                          <BudgetProvider>
+                            
+                              <App />
+                            
+                          </BudgetProvider>
                         </NotificationsProvider>
                       </DocsProvider>
                     </ActivityProvider>
