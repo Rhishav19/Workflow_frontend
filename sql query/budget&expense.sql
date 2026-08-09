@@ -1,5 +1,4 @@
 -- Budget & Expense Tables for Workflow Dashboard
-
 -- Project Budgets table
 CREATE TABLE IF NOT EXISTS project_budgets (
     id TEXT PRIMARY KEY,

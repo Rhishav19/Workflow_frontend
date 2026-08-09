@@ -3,31 +3,33 @@ import { X } from "lucide-react";
 import { columns } from "../../data/tasks";
 import { useProjects } from "../../context/ProjectsContext";
 import { useWorkspace } from "../../context/WorkspaceContext";
+import { useMembers } from "../../context/MembersContext";
 import { formatDueDate } from "../../utils/formatDate";
 
 const PRIORITY_OPTIONS = ["High", "Medium", "Low"];
 export default function NewTaskModal({ onClose, onCreate }) {
   const { workspaceId } = useWorkspace();
   const { projects } = useProjects();
+  const { members } = useMembers();
   const workspaceProjects = projects.filter((p) => p.workspaceId === workspaceId);
+  const workspaceMembers = members.filter((m) => m.workspaceId === workspaceId);
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [projectId, setProjectId] = useState(workspaceProjects[0]?.id ?? "");
-  const [assignee, setAssignee] = useState("");
+  const [assignee, setAssignee] = useState(workspaceMembers[0]?.name ?? "");
   const [priority, setPriority] = useState("Medium");
   const [status, setStatus] = useState("To Do");
   const [dueDate, setDueDate] = useState("");
   const [error, setError] = useState("");
 
-  // Local date, not UTC — avoids the day rolling back near midnight for users west of UTC.
   const today = new Date();
   const todayIso = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
 
   function handleSubmit(e) {
     e.preventDefault();
 
-    if (!title.trim() || !assignee.trim()) {
+    if (!title.trim() || !assignee) {
       setError("Task title and assignee are required.");
       return;
     }
@@ -46,7 +48,7 @@ export default function NewTaskModal({ onClose, onCreate }) {
       description: description.trim(),
       projectId,
       priority,
-      assignee: assignee.trim().slice(0, 2).toUpperCase(),
+      assignee,
       dueDate: formatDueDate(dueDate),
       status,
     });
@@ -125,16 +127,25 @@ export default function NewTaskModal({ onClose, onCreate }) {
 
           <div>
             <label className="mb-1.5 block text-sm font-medium text-gray-700">
-              Assignee initials
+              Assignee
             </label>
-            <input
-              type="text"
-              value={assignee}
-              onChange={(e) => setAssignee(e.target.value)}
-              placeholder="e.g. SC"
-              maxLength={2}
-              className="h-10 w-full rounded-lg border border-gray-200 px-3 text-sm uppercase focus:border-blue-500 focus:outline-none"
-            />
+            {workspaceMembers.length === 0 ? (
+              <p className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-700">
+                No members in this workspace yet — add one first.
+              </p>
+            ) : (
+              <select
+                value={assignee}
+                onChange={(e) => setAssignee(e.target.value)}
+                className="h-10 w-full rounded-lg border border-gray-200 px-3 text-sm focus:border-blue-500 focus:outline-none"
+              >
+                {workspaceMembers.map((member) => (
+                  <option key={member.id} value={member.name}>
+                    {member.name}
+                  </option>
+                ))}
+              </select>
+            )}
           </div>
 
           <div className="grid grid-cols-2 gap-3">

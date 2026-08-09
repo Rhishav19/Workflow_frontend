@@ -7,6 +7,9 @@ import { useWorkspace } from "../context/WorkspaceContext";
 import { hasPermission } from "../data/permissions";
 import { STATUS_STYLES } from "../data/projects";
 import { PRIORITY_STYLES } from "../data/tasks";
+import { initialsFor } from "../utils/initials";
+import { Plus, X as XIcon } from "lucide-react";
+import AddTeamMemberModal from "../components/projects/AddTeamMemberModal";
 
 const PROJECT_STATUSES = ["Planning", "On Track", "At Risk", "Completed"];
 
@@ -19,6 +22,7 @@ export default function ProjectDetail() {
   const canManage = hasPermission(currentRole, "canManageProject");
   const [statusMenuOpen, setStatusMenuOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [teamModalOpen, setTeamModalOpen] = useState(false);
 
   const project = projects.find((p) => p.id === projectId);
   const projectTasks = tasks.filter((t) => t.projectId === projectId);
@@ -35,10 +39,15 @@ export default function ProjectDetail() {
   }
 
   const doneCount = projectTasks.filter((t) => t.status === "Done").length;
-  const taskProgress = projectTasks.length
-    ? Math.round((doneCount / projectTasks.length) * 100)
-    : 0;
+  function handleAddTeamMember(initials) {
+  const currentTeam = project.team ?? [];
+  updateProject(project.id, { team: [...currentTeam, initials] });
+}
 
+function handleRemoveTeamMember(initials) {
+  const currentTeam = project.team ?? [];
+  updateProject(project.id, { team: currentTeam.filter((i) => i !== initials) });
+}
   return (
     <div className="px-8 py-8">
       <button
@@ -130,20 +139,7 @@ export default function ProjectDetail() {
         {project.description}
       </p>
 
-      <div className="mb-8 grid grid-cols-3 gap-5">
-        <div className="rounded-2xl border border-gray-200 bg-white p-5">
-          <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">
-            Progress
-          </p>
-          <p className="mt-1 text-2xl font-bold text-gray-900">{project.progress}%</p>
-          <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-gray-100">
-            <div
-              className="h-full rounded-full bg-blue-600"
-              style={{ width: `${project.progress}%` }}
-            />
-          </div>
-        </div>
-
+      <div className="mb-8 grid grid-cols-2 gap-5">
         <div className="rounded-2xl border border-gray-200 bg-white p-5">
           <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">
             Tasks
@@ -151,7 +147,7 @@ export default function ProjectDetail() {
           <p className="mt-1 text-2xl font-bold text-gray-900">
             {doneCount}/{projectTasks.length}
           </p>
-          <p className="mt-2 text-xs text-gray-400">{taskProgress}% complete</p>
+          <p className="mt-2 text-xs text-gray-400">completed</p>
         </div>
 
         <div className="rounded-2xl border border-gray-200 bg-white p-5">
@@ -165,24 +161,46 @@ export default function ProjectDetail() {
         </div>
       </div>
 
-      <div className="mb-6 flex items-center gap-2">
-        <Users size={16} className="text-gray-400" />
-        <div className="flex -space-x-2">
-          {project.team.map((initials, i) => (
-            <div
-              key={i}
-              className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-blue-50 text-xs font-semibold text-blue-600"
-            >
-              {initials}
-            </div>
-          ))}
-          {project.teamOverflow > 0 && (
-            <div className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-gray-100 text-xs font-medium text-gray-500">
-              +{project.teamOverflow}
-            </div>
-          )}
+      <div className="mb-6">
+  <div className="mb-2 flex items-center gap-2">
+    <Users size={16} className="text-gray-400" />
+    <p className="text-sm font-medium text-gray-700">Team</p>
+    {canManage && (
+      <button
+        onClick={() => setTeamModalOpen(true)}
+        className="ml-1 flex h-6 w-6 items-center justify-center rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100"
+        aria-label="Add team member"
+      >
+        <Plus size={13} />
+      </button>
+    )}
+  </div>
+
+  <div className="flex flex-wrap gap-2">
+    {(project.team ?? []).length === 0 && (
+      <p className="text-sm text-gray-400">No one assigned yet.</p>
+    )}
+    {(project.team ?? []).map((initials, i) => (
+      <div
+        key={i}
+        className="group/team flex items-center gap-1.5 rounded-full border border-gray-200 bg-white py-1 pl-1 pr-2"
+      >
+        <div className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-50 text-[10px] font-semibold text-blue-600">
+          {initials}
         </div>
+        {canManage && (
+          <button
+            onClick={() => handleRemoveTeamMember(initials)}
+            className="text-gray-300 hover:text-red-500"
+            aria-label={`Remove ${initials} from team`}
+          >
+            <XIcon size={13} />
+          </button>
+        )}
       </div>
+    ))}
+  </div>
+</div>
 
       <h2 className="mb-4 text-lg font-semibold text-gray-900">Tasks in this project</h2>
 
@@ -213,14 +231,24 @@ export default function ProjectDetail() {
               </div>
               <div className="flex items-center gap-3">
                 <span className="text-xs text-gray-400">{task.status}</span>
-                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-50 text-[10px] font-semibold text-blue-600">
-                  {task.assignee}
+                <div
+                  title={task.assignee}
+                  className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-50 text-[10px] font-semibold text-blue-600"
+                >
+                  {initialsFor(task.assignee)}
                 </div>
               </div>
             </div>
           ))}
         </div>
       )}
+      {teamModalOpen && (
+  <AddTeamMemberModal
+    project={project}
+    onClose={() => setTeamModalOpen(false)}
+    onAdd={handleAddTeamMember}
+  />
+)}
     </div>
   );
 }

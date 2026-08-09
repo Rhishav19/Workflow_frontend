@@ -12,6 +12,7 @@ import ProjectDetail from "./pages/ProjectDetail";
 import Tasks from "./pages/Tasks";
 import TimeTracking from "./pages/TimeTracking";
 import Members from "./pages/Members";
+import Activity from "./pages/Activity";
 import Docs from "./pages/Docs";
 import Announcements from "./pages/Announcements";
 import Settings from "./pages/Settings";
@@ -34,6 +35,7 @@ function App() {
           <Route path="tasks" element={<Tasks />} />
           <Route path="time-tracking" element={<TimeTracking />} />
           <Route path="members" element={<Members />} />
+          <Route path="activity" element={<Activity />} />
           <Route path="docs" element={<Docs />} />
           <Route path="announcements" element={<Announcements />} />
           <Route path="settings" element={<Settings />} />

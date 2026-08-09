@@ -1,6 +1,6 @@
 import DocCard from "./DocCard";
 
-export default function DocsGrid({ docs }) {
+export default function DocsGrid({ docs, onDelete }) {
   if (docs.length === 0) {
     return (
       <div className="rounded-2xl border border-dashed border-gray-200 bg-white/60 px-6 py-16 text-center">
@@ -17,7 +17,7 @@ export default function DocsGrid({ docs }) {
   return (
     <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
       {docs.map((doc) => (
-        <DocCard key={doc.id} doc={doc} />
+        <DocCard key={doc.id} doc={doc} onDelete={onDelete} />
       ))}
     </div>
   );
