@@ -146,6 +146,11 @@ try {
 
     page.setDefaultTimeout(15000);
     await page.goto(`${baseUrl}/dashboard`, { waitUntil: "domcontentloaded" });
+    if (await page.getByText("Task Completion Rate").isVisible()) {
+      failures.push(`${viewport.name}: dashboard still renders analytics`);
+    }
+
+    await page.goto(`${baseUrl}/dashboard/analytics`, { waitUntil: "domcontentloaded" });
     await page.getByText("Task Completion Rate").waitFor({ timeout: 10000 });
     await page.waitForTimeout(500);
 

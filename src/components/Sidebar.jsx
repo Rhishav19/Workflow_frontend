@@ -1,5 +1,6 @@
 import {
   LayoutDashboard,
+  ChartNoAxesCombined,
   FolderKanban,
   CheckSquare,
   Clock3,
@@ -15,6 +16,7 @@ import { useWorkspace } from "../context/WorkspaceContext";
 
 const menus = [
   { name: "Dashboard", icon: <LayoutDashboard size={20} />, path: "/dashboard" },
+  { name: "Analytics", icon: <ChartNoAxesCombined size={20} />, path: "/dashboard/analytics" },
   { name: "Projects", icon: <FolderKanban size={20} />, path: "/dashboard/projects" },
   { name: "Tasks", icon: <CheckSquare size={20} />, path: "/dashboard/tasks" },
   { name: "Time Tracking", icon: <Clock3 size={20} />, path: "/dashboard/time-tracking" },

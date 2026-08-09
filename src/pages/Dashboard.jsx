@@ -1,7 +1,5 @@
 import DashboardHeader from "../components/dashboard/DashboardHeader";
 import StatsSection from "../components/dashboard/StatsSection";
-import RecentActivity from "../components/dashboard/RecentActivity";
-import AnalyticsSection from "../components/dashboard/analytics/AnalyticsSection";
 
 const Dashboard = () => {
   return (
@@ -9,18 +7,6 @@ const Dashboard = () => {
       <DashboardHeader />
 
       <StatsSection />
-
-      <AnalyticsSection />
-
-      <div className="grid lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2">
-          <RecentActivity />
-        </div>
-
-      </div>
-
-      <div className="grid lg:grid-cols-2 gap-8">
-      </div>
     </div>
   );
 };
