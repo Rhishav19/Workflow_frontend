@@ -9,7 +9,7 @@ import { useWorkspace } from "../context/WorkspaceContext";
 
 export default function Projects() {
   const { workspaceId } = useWorkspace();
-  const { projects, addProject } = useProjects();
+  const { projects, addProject, deleteProject } = useProjects();
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState("All");
   const [modalOpen, setModalOpen] = useState(false);
@@ -49,7 +49,7 @@ export default function Projects() {
         activeFilter={filter}
         onFilterChange={setFilter}
       />
-      <ProjectsGrid projects={filtered} />
+      <ProjectsGrid projects={filtered} onDelete={deleteProject} />
 
       {modalOpen && (
         <NewProjectModal onClose={() => setModalOpen(false)} onCreate={handleCreate} />

@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 
 const ProjectsContext = createContext(null);
@@ -8,8 +8,25 @@ export function ProjectsProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const fetchProjects = useCallback(async function fetchProjects() {
+  function mapFromDb(row) {
+    return {
+      id: row.id,
+      name: row.name,
+      description: row.description,
+      department: row.department,
+      dueDate: row.due_date,
+      team: row.team,
+      teamOverflow: row.team_overflow,
+      progress: row.progress,
+      status: row.status,
+      workspaceId: row.workspace_id,
+      createdAt: row.created_at,
+    };
+  }
+
+  async function fetchProjects() {
     setLoading(true);
+
     const { data, error } = await supabase
       .from("projects")
       .select("*")
@@ -18,28 +35,20 @@ export function ProjectsProvider({ children }) {
     if (error) {
       console.error("Error fetching projects:", error);
       setError(error.message);
-    } else {
-      const mapped = data.map((p) => ({
-        id: p.id,
-        workspaceId: p.workspace_id,
-        name: p.name,
-        description: p.description,
-        department: p.department,
-        status: p.status,
-        progress: p.progress,
-        dueDate: p.due_date,
-        team: p.team ?? [],
-        teamOverflow: p.team_overflow,
-        createdAt: p.created_at,
-      }));
-      setProjects(mapped);
-      setError(null);
+      setLoading(false);
+      return { error };
     }
+
+    setProjects(data.map(mapFromDb));
+    setError(null);
     setLoading(false);
-  }, []);
+
+    return { error: null };
+  }
 
   useEffect(() => {
     fetchProjects();
+
     const channel = supabase
       .channel("projects-changes")
       .on(
@@ -54,35 +63,43 @@ export function ProjectsProvider({ children }) {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [fetchProjects]);
+  }, []);
 
-  async function addProject(project) {
-    const { error } = await supabase.from("projects").insert({
-      id: project.id,
-      workspace_id: project.workspaceId,
-      name: project.name,
-      description: project.description,
-      department: project.department,
-      status: project.status,
-      progress: project.progress,
-      due_date: project.dueDate,
-      team: project.team,
-      team_overflow: project.teamOverflow,
-    });
+  async function addProject(newProject) {
+    const dbProject = {
+      id: crypto.randomUUID(),
+      name: newProject.name,
+      description: newProject.description ?? null,
+      department: newProject.department ?? null,
+      due_date: newProject.dueDate ?? null,
+      team: newProject.team ?? null,
+      status: newProject.status ?? "Active",
+      workspace_id: newProject.workspaceId,
+    };
+
+    const { data, error } = await supabase
+      .from("projects")
+      .insert(dbProject)
+      .select()
+      .single();
 
     if (error) {
       console.error("Error creating project:", error);
-      return;
+      return { error };
     }
 
-    setProjects((prev) => [
-      { ...project, createdAt: new Date().toISOString() },
-      ...prev,
-    ]);
+    const project = mapFromDb(data);
+
+    setProjects((prev) => [project, ...prev]);
+
+    return {
+      error: null,
+      project,
+    };
   }
 
+  // updates is a partial object like { status: "At Risk" } or { name: "..." }
   async function updateProject(projectId, updates) {
-    // updates is a partial object like { status: "At Risk" } or { name: "..." }
     const dbUpdates = {};
     if ("name" in updates) dbUpdates.name = updates.name;
     if ("description" in updates) dbUpdates.description = updates.description;
@@ -121,10 +138,18 @@ export function ProjectsProvider({ children }) {
     return { error: null };
   }
 
+  const value = {
+    projects,
+    loading,
+    error,
+    fetchProjects,
+    addProject,
+    updateProject,
+    deleteProject,
+  };
+
   return (
-    <ProjectsContext.Provider
-      value={{ projects, addProject, updateProject, deleteProject, loading, error }}
-    >
+    <ProjectsContext.Provider value={value}>
       {children}
     </ProjectsContext.Provider>
   );
@@ -132,8 +157,10 @@ export function ProjectsProvider({ children }) {
 
 export function useProjects() {
   const context = useContext(ProjectsContext);
+
   if (!context) {
     throw new Error("useProjects must be used within a ProjectsProvider");
   }
+
   return context;
 }

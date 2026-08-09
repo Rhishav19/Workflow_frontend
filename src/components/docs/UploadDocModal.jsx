@@ -4,19 +4,13 @@ import { docCategories } from "../../data/docs";
 
 const CATEGORY_OPTIONS = docCategories.filter((c) => c !== "All");
 
-function guessFileType(fileName) {
-  const ext = fileName.split(".").pop().toLowerCase();
-  if (["xls", "xlsx", "csv"].includes(ext)) return "Sheet";
-  return "Doc";
-}
-
-export default function UploadDocModal({ onClose, onUpload }) {
+export default function UploadDocModal({ onClose, onUpload, uploading, uploadError }) {
   const inputRef = useRef(null);
   const [file, setFile] = useState(null);
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState(CATEGORY_OPTIONS[0]);
   const [isDragOver, setIsDragOver] = useState(false);
-  const [error, setError] = useState("");
+  const [localError, setLocalError] = useState("");
 
   function handleFileSelect(selected) {
     if (!selected) return;
@@ -24,7 +18,7 @@ export default function UploadDocModal({ onClose, onUpload }) {
     if (!title) {
       setTitle(selected.name.replace(/\.[^/.]+$/, ""));
     }
-    setError("");
+    setLocalError("");
   }
 
   function handleDrop(e) {
@@ -34,31 +28,32 @@ export default function UploadDocModal({ onClose, onUpload }) {
     handleFileSelect(dropped);
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
 
     if (!file) {
-      setError("Choose a file to upload.");
+      setLocalError("Choose a file to upload.");
       return;
     }
     if (!title.trim()) {
-      setError("Give the document a title.");
+      setLocalError("Give the document a title.");
       return;
     }
 
-    onUpload({
-      id: `doc-${Date.now()}`,
+    setLocalError("");
+
+    const success = await onUpload({
+      file,
       title: title.trim(),
       category,
-      author: "You",
-      updated: "Just now",
-      fileType: guessFileType(file.name),
-      fileName: file.name,
-      fileSize: file.size,
     });
 
-    onClose();
+    if (success) {
+      onClose();
+    }
   }
+
+  const error = localError || uploadError;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
@@ -116,9 +111,6 @@ export default function UploadDocModal({ onClose, onUpload }) {
                 <p className="text-sm font-medium text-gray-600">
                   Click to browse or drag a file here
                 </p>
-                <p className="text-xs text-gray-400">
-                  This is a demo — files aren't actually stored yet
-                </p>
               </>
             )}
           </div>
@@ -163,9 +155,10 @@ export default function UploadDocModal({ onClose, onUpload }) {
             </button>
             <button
               type="submit"
-              className="h-10 rounded-lg bg-blue-600 px-4 text-sm font-medium text-white hover:bg-blue-700"
+              disabled={uploading}
+              className="h-10 rounded-lg bg-blue-600 px-4 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-60"
             >
-              Upload
+              {uploading ? "Uploading..." : "Upload"}
             </button>
           </div>
         </form>

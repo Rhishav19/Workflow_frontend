@@ -2,8 +2,11 @@ export const PERMISSIONS = {
   canCreateProject: ["Admin", "Manager"],
   canCreateTask: ["Admin", "Manager"],
   canAddMember: ["Admin"],
+  canRemoveMember: ["Admin", "Manager"],
   canReviewTask: ["Admin", "Manager"],
   canCreateAnnouncement: ["Admin", "Manager"],
+  canDeleteAnnouncement: ["Admin", "Manager"],
+  canDeleteDoc: ["Admin", "Manager"],
   canSubmitTask: ["Employee"],
   canDeleteTask: ["Admin", "Manager"],
   canManageProject: ["Admin", "Manager"]

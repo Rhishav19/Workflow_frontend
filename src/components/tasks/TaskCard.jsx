@@ -4,6 +4,7 @@ import { columns, PRIORITY_STYLES } from "../../data/tasks";
 import { useProjects } from "../../context/ProjectsContext";
 import { useWorkspace } from "../../context/WorkspaceContext";
 import { hasPermission, canMoveTask } from "../../data/permissions";
+import { initialsFor } from "../../utils/initials";
 
 const PRIORITIES = ["High", "Medium", "Low"];
 
@@ -23,8 +24,7 @@ export default function TaskCard({
   const canReview = hasPermission(currentRole, "canReviewTask");
   const canSubmitRole = hasPermission(currentRole, "canSubmitTask");
   const canDelete = hasPermission(currentRole, "canDeleteTask");
-  const canSubmit =
-    canSubmitRole && task.status !== "Review" && task.status !== "Done";
+  const canSubmit = canSubmitRole && task.status === "In Progress";
   const projectName = projects.find((p) => p.id === task.projectId)?.name ?? "Unknown project";
   const canDrag = columns.some(
     (col) => col !== task.status && canMoveTask(currentRole, task.status, col)
@@ -75,8 +75,11 @@ export default function TaskCard({
         </div>
 
         <div className="flex items-center gap-1.5">
-          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-50 text-[10px] font-semibold text-blue-600">
-            {task.assignee}
+        <div 
+          title={task.assignee}
+          className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-50 text-[10px] font-semibold text-blue-600"
+          >
+          {initialsFor(task.assignee)}  
           </div>
           {canDelete && (
             <button

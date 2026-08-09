@@ -1,7 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
-import { accountExists, createAccount } from "../data/auth";
-import { upsertMembership } from "../data/workspacesApi";
+import { createNotification } from "../data/notificationsApi";
 
 const MembersContext = createContext(null);
 
@@ -45,19 +44,6 @@ export function MembersProvider({ children }) {
 
   async function saveMember(memberData) {
     const exists = members.some((m) => m.id === memberData.id);
-    let tempPassword = null;
-
-    // Adding someone here should actually grant them access — not just a
-    // roster entry — so create their login and workspace role if missing.
-    const hadAccount = await accountExists(memberData.email);
-    if (!hadAccount) {
-      const accountResult = await createAccount({
-        name: memberData.name,
-        email: memberData.email,
-      });
-      tempPassword = accountResult?.tempPassword ?? null;
-    }
-    await upsertMembership(memberData.email, memberData.workspaceId, memberData.role);
 
     const dbRow = {
       id: memberData.id,
@@ -77,7 +63,7 @@ export function MembersProvider({ children }) {
 
     if (error) {
       console.error("Error saving member:", error);
-      return { tempPassword: null, isNewAccount: false };
+      return;
     }
 
     setMembers((prev) =>
@@ -86,11 +72,39 @@ export function MembersProvider({ children }) {
         : [{ ...memberData, createdAt: new Date().toISOString() }, ...prev]
     );
 
-    return { tempPassword, isNewAccount: !hadAccount };
+    if (!exists) {
+      createNotification({
+        workspaceId: memberData.workspaceId,
+        type: "member_added",
+        message: `${memberData.name} joined as ${memberData.role}`,
+      });
+    }
+  }
+
+  async function removeMember(memberId, workspaceId, memberName) {
+    const { error } = await supabase
+      .from("members")
+      .delete()
+      .eq("id", memberId);
+
+    if (error) {
+      console.error("Error removing member:", error);
+      return false;
+    }
+
+    setMembers((prev) => prev.filter((m) => m.id !== memberId));
+
+    createNotification({
+      workspaceId,
+      type: "member_removed",
+      message: `${memberName} has been removed from the workspace`,
+    });
+
+    return true;
   }
 
   return (
-    <MembersContext.Provider value={{ members, loading, saveMember, error }}>
+   <MembersContext.Provider value={{ members, loading, saveMember, removeMember, error }}>
       {children}
     </MembersContext.Provider>
   );

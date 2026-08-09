@@ -1,6 +1,5 @@
 import { useState } from "react";
 import {
-  Bell,
   Settings,
   User,
   LogOut,
@@ -10,6 +9,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useWorkspace } from "../context/WorkspaceContext";
 import SearchDropdown from "./SearchDropdown";
+import NotificationsDropdown from "./NotificationsDropdown";
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -27,9 +27,8 @@ const Navbar = () => {
     <header className="flex flex-col gap-3 bg-white px-4 py-4 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:px-8">
       <SearchDropdown />
 
-      <div className="flex items-center justify-end gap-4 sm:gap-5">
-        <Bell className="cursor-pointer" />
-
+     <div className="flex items-center gap-5">
+        <NotificationsDropdown />
         <Link to="/dashboard/settings">
           <Settings className="cursor-pointer text-gray-600 hover:text-blue-600" />
         </Link>

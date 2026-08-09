@@ -8,8 +8,8 @@ import {
   FileText,
   Megaphone,
   UserPlus,
+  Wallet,
 } from "lucide-react";
-
 import { NavLink } from "react-router-dom";
 import WorkspaceSwitcher from "./WorkspaceSwitcher";
 import { useWorkspace } from "../context/WorkspaceContext";
@@ -27,45 +27,56 @@ const menus = [
 
 const Sidebar = () => {
   const { currentRole } = useWorkspace();
+  const isAdminOrManager = currentRole === "Admin" || currentRole === "Manager";
 
-  const visibleMenus =
-    currentRole === "Admin"
+  const visibleMenus = [
+    ...menus,
+    ...(isAdminOrManager
+      ? [{ name: "Budget", icon: <Wallet size={20} />, path: "/dashboard/budget" }]
+      : []),
+    ...(currentRole === "Admin"
       ? [
-          ...menus,
           {
             name: "Create Account",
             icon: <UserPlus size={20} />,
             path: "/dashboard/admin/create-account",
           },
         ]
-      : menus;
+      : []),
+  ];
 
   return (
     <aside className="w-full border-b bg-white shadow-lg lg:min-h-screen lg:w-64 lg:border-b-0 lg:border-r">
       <div className="border-b p-4 text-2xl font-bold lg:p-6">
         Workflow
       </div>
-
       <WorkspaceSwitcher />
-
-      <nav className="mt-2 flex overflow-x-auto lg:mt-4 lg:block">
-        {visibleMenus.map((menu) => (
+      <nav className="mt-2 flex overflow-x-auto lg:mt-4 lg:block lg:space-y-2 lg:px-2">
+        {visibleMenus.map((item) => (
           <NavLink
-            key={menu.name}
-            to={menu.path}
-            end={menu.path === "/dashboard"}
+            key={item.name}
+            to={item.path}
             className={({ isActive }) =>
-              `flex shrink-0 items-center gap-2.5 px-4 py-3 text-sm transition-all lg:gap-3 lg:px-6 lg:py-4 lg:text-base ${
-                isActive ? "bg-blue-600 text-white" : "text-gray-700 hover:bg-gray-100"
+              `flex shrink-0 items-center gap-2.5 px-4 py-3 text-sm font-medium transition-all lg:gap-3 lg:rounded-xl lg:px-4 lg:py-3 lg:text-base ${
+                isActive
+                  ? "bg-blue-600 text-white shadow-md"
+                  : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
               }`
             }
           >
-            {menu.icon}
-            <span>{menu.name}</span>
+            {({ isActive }) => (
+              <>
+                <span className={isActive ? "text-white" : "text-gray-400"}>
+                  {item.icon}
+                </span>
+                <span>{item.name}</span>
+              </>
+            )}
           </NavLink>
         ))}
       </nav>
     </aside>
   );
 };
+
 export default Sidebar;
