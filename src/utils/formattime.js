@@ -1,31 +1,21 @@
-// Turns an ISO timestamp (e.g. from a Supabase created_at column) into a
-// short relative label like "2h ago", matching the style used throughout
-// the app (e.g. seed announcement copy like "6 hours ago").
+// "5 minutes ago", "3 hours ago", "2 days ago", etc.
 export function formatRelativeTime(isoString) {
   if (!isoString) return "";
 
   const then = new Date(isoString).getTime();
-  if (Number.isNaN(then)) return "";
+  const now = Date.now();
+  const diffSeconds = Math.max(0, Math.floor((now - then) / 1000));
 
-  const diffMs = Date.now() - then;
-  const diffSec = Math.floor(diffMs / 1000);
+  if (diffSeconds < 60) return "just now";
 
-  if (diffSec < 60) return "Just now";
+  const diffMinutes = Math.floor(diffSeconds / 60);
+  if (diffMinutes < 60) return `${diffMinutes}m ago`;
 
-  const diffMin = Math.floor(diffSec / 60);
-  if (diffMin < 60) return `${diffMin}m ago`;
+  const diffHours = Math.floor(diffMinutes / 60);
+  if (diffHours < 24) return `${diffHours}h ago`;
 
-  const diffHr = Math.floor(diffMin / 60);
-  if (diffHr < 24) return `${diffHr}h ago`;
+  const diffDays = Math.floor(diffHours / 24);
+  if (diffDays < 7) return `${diffDays}d ago`;
 
-  const diffDay = Math.floor(diffHr / 24);
-  if (diffDay < 7) return `${diffDay}d ago`;
-
-  const diffWeek = Math.floor(diffDay / 7);
-  if (diffWeek < 5) return `${diffWeek}w ago`;
-
-  return new Date(isoString).toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-  });
+  return new Date(isoString).toLocaleDateString();
 }

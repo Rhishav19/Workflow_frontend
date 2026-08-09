@@ -93,7 +93,7 @@ export function DocsProvider({ children }) {
     return { error: null };
   }
 
- async function deleteDoc(id, filePath) {
+  async function deleteDoc(id, filePath) {
     if (filePath) {
       const { error: storageError } = await supabase.storage.from(BUCKET).remove([filePath]);
       if (storageError) {

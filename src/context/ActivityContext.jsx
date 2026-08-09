@@ -4,11 +4,11 @@ import { supabase } from "../lib/supabaseClient";
 const ActivityContext = createContext(null);
 
 export function ActivityProvider({ children }) {
-  const [activity, setActivity] = useState([]);
+  const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchActivity();
+    fetchActivities();
 
     const channel = supabase
       .channel("activity-log-changes")
@@ -16,7 +16,7 @@ export function ActivityProvider({ children }) {
         "postgres_changes",
         { event: "*", schema: "public", table: "activity_log" },
         () => {
-          fetchActivity();
+          fetchActivities();
         }
       )
       .subscribe();
@@ -26,8 +26,9 @@ export function ActivityProvider({ children }) {
     };
   }, []);
 
-  async function fetchActivity() {
+  async function fetchActivities() {
     setLoading(true);
+
     const { data, error } = await supabase
       .from("activity_log")
       .select("*")
@@ -46,7 +47,7 @@ export function ActivityProvider({ children }) {
         project: a.project,
         createdAt: a.created_at,
       }));
-      setActivity(mapped);
+      setActivities(mapped);
     }
     setLoading(false);
   }
@@ -54,8 +55,10 @@ export function ActivityProvider({ children }) {
   // Fire-and-forget: activity logging should never block or break the
   // action it's describing (creating a task, posting an announcement, etc).
   async function logActivity({ workspaceId, actor, verb, target, project }) {
+    const id = `act-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+
     const { error } = await supabase.from("activity_log").insert({
-      id: `act-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+      id,
       workspace_id: workspaceId,
       actor,
       verb,
@@ -68,11 +71,24 @@ export function ActivityProvider({ children }) {
       return;
     }
 
-    fetchActivity();
+    // Optimistic prepend — the realtime subscription will also refetch,
+    // but this makes it show up instantly for the person who triggered it.
+    setActivities((prev) => [
+      {
+        id,
+        workspaceId,
+        actor,
+        verb,
+        target: target ?? null,
+        project: project ?? null,
+        createdAt: new Date().toISOString(),
+      },
+      ...prev,
+    ]);
   }
 
   return (
-    <ActivityContext.Provider value={{ activity, loading, logActivity }}>
+    <ActivityContext.Provider value={{ activities, loading, logActivity }}>
       {children}
     </ActivityContext.Provider>
   );
