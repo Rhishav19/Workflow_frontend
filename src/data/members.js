@@ -5,12 +5,6 @@ export const ROLE_STYLES = {
   Employee: "bg-gray-100 text-gray-600",
 };
 
-export const STATUS_STYLES = {
-  Active: "bg-emerald-500",
-  Away: "bg-amber-500",
-  Offline: "bg-gray-300",
-};
-
 export const members = [
   {
     id: "mem-1",
@@ -19,7 +13,6 @@ export const members = [
     role: "Manager",
     department: "Product Design",
     email: "sarah.chen@workflow.com",
-    status: "Active",
     joinedDate: "Jan 2024",
   },
   {
@@ -29,7 +22,6 @@ export const members = [
     role: "Employee",
     department: "Backend Engineering",
     email: "david.miller@workflow.com",
-    status: "Active",
     joinedDate: "Mar 2024",
   },
   {
@@ -39,7 +31,6 @@ export const members = [
     role: "Manager",
     department: "Financial Operations",
     email: "alex.rivera@workflow.com",
-    status: "Away",
     joinedDate: "Nov 2023",
   },
   {
@@ -49,7 +40,6 @@ export const members = [
     role: "Employee",
     department: "Backend Engineering",
     email: "tara.nguyen@workflow.com",
-    status: "Active",
     joinedDate: "Jun 2024",
   },
   {
@@ -59,7 +49,6 @@ export const members = [
     role: "Employee",
     department: "Growth",
     email: "jordan.kim@workflow.com",
-    status: "Offline",
     joinedDate: "Feb 2024",
   },
   {
@@ -69,7 +58,6 @@ export const members = [
     role: "Manager",
     department: "Product Design",
     email: "priya.sharma@workflow.com",
-    status: "Active",
     joinedDate: "Sep 2023",
   },
   {
@@ -79,7 +67,6 @@ export const members = [
     role: "Employee",
     department: "Growth",
     email: "leo.bennett@workflow.com",
-    status: "Active",
     joinedDate: "May 2024",
   },
   {
@@ -89,7 +76,6 @@ export const members = [
     role: "Employee",
     department: "Product Design",
     email: "maya.torres@workflow.com",
-    status: "Away",
     joinedDate: "Apr 2024",
   },
 ];

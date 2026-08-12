@@ -2,7 +2,6 @@ import { useState } from "react";
 import { X } from "lucide-react";
 
 const ROLE_OPTIONS = ["Manager", "Employee"];
-const STATUS_OPTIONS = ["Active", "Away", "Offline"];
 
 function getInitials(name) {
   return name
@@ -21,7 +20,6 @@ export default function MemberModal({ member, onClose, onSave }) {
   const [email, setEmail] = useState(member?.email ?? "");
   const [department, setDepartment] = useState(member?.department ?? "");
   const [role, setRole] = useState(member?.role ?? "Employee");
-  const [status, setStatus] = useState(member?.status ?? "Active");
   const [error, setError] = useState("");
 
   function handleSubmit(e) {
@@ -43,7 +41,6 @@ export default function MemberModal({ member, onClose, onSave }) {
       email: email.trim(),
       department: department.trim(),
       role,
-      status,
       joinedDate: member?.joinedDate ?? "Just now",
     });
 
@@ -111,40 +108,21 @@ export default function MemberModal({ member, onClose, onSave }) {
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="mb-1.5 block text-sm font-medium text-gray-700">
-                Role
-              </label>
-              <select
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-                className="h-10 w-full rounded-lg border border-gray-200 px-3 text-sm focus:border-blue-500 focus:outline-none"
-              >
-                {ROLE_OPTIONS.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="mb-1.5 block text-sm font-medium text-gray-700">
-                Status
-              </label>
-              <select
-                value={status}
-                onChange={(e) => setStatus(e.target.value)}
-                className="h-10 w-full rounded-lg border border-gray-200 px-3 text-sm focus:border-blue-500 focus:outline-none"
-              >
-                {STATUS_OPTIONS.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
-            </div>
+          <div>
+            <label className="mb-1.5 block text-sm font-medium text-gray-700">
+              Role
+            </label>
+            <select
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+              className="h-10 w-full rounded-lg border border-gray-200 px-3 text-sm focus:border-blue-500 focus:outline-none"
+            >
+              {ROLE_OPTIONS.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className="mt-2 flex justify-end gap-2">

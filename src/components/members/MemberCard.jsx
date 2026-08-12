@@ -1,5 +1,5 @@
 import { Mail, Pencil, Trash2 } from "lucide-react";
-import { ROLE_STYLES, STATUS_STYLES } from "../../data/members";
+import { ROLE_STYLES } from "../../data/members";
 import { useWorkspace } from "../../context/WorkspaceContext";
 import { hasPermission } from "../../data/permissions";
 
@@ -34,13 +34,8 @@ export default function MemberCard({ member, onEdit, onDelete }) {
 
       <div className="mb-4 flex items-start justify-between pr-14">
         <div className="flex items-center gap-3">
-          <div className="relative">
-            <div className="flex h-11 w-11 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-blue-600">
-              {member.initials}
-            </div>
-            <span
-              className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-white ${STATUS_STYLES[member.status]}`}
-            />
+          <div className="flex h-11 w-11 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-blue-600">
+            {member.initials}
           </div>
           <div>
             <p className="text-[15px] font-semibold text-gray-900">
