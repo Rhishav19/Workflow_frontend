@@ -3,6 +3,7 @@ import Layout from "./components/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminRoute from "./components/AdminRoute";
 import Landing from "./pages/Landing";
+import SignIn from "./pages/SignIn";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
 import ChangePassword from "./pages/ChangePassword";
@@ -26,6 +27,7 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<Landing />} />
+      <Route path="/signin" element={<SignIn />} />
       <Route path="/register" element={<Register />} />
       <Route path="/login" element={<Login />} />
       <Route path="/change-password" element={<ChangePassword />} />
