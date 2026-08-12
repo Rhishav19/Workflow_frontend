@@ -1,12 +1,9 @@
 import { FileText, FileSpreadsheet, Trash2 } from "lucide-react";
 import { CATEGORY_STYLES } from "../../data/docs";
-<<<<<<< HEAD
-=======
 import { formatRelativeTime } from "../../utils/formattime";
 import { hasPermission } from "../../data/permissions";
 import { useWorkspace } from "../../context/WorkspaceContext";
 import { useAuth } from "../../context/AuthContext";
->>>>>>> 2abe1e6e363d87e6ddee9ff154196098c4821216
 
 export default function DocCard({ doc, onDelete }) {
   const { currentRole } = useWorkspace();

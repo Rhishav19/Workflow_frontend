@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useAuth } from "../context/AuthContext";
+import { useWorkspace } from "../context/WorkspaceContext";
 import { useOrgChart } from "../context/OrgChartContext";
 import OrgChartHeader from "../components/orgchart/OrgChartHeader";
 import OrgTree from "../components/orgchart/OrgTree";
@@ -7,11 +7,11 @@ import DepartmentLegend from "../components/orgchart/DepartmentLegend";
 import EditOrgModal from "../components/orgchart/EditOrgModal";
 
 export default function OrgChart() {
-  const { user } = useAuth();
+  const { currentRole } = useWorkspace();
   const { visibleTree, members, loading } = useOrgChart();
   const [editMember, setEditMember] = useState(null);
 
-  const isAdmin = user?.role === "Admin";
+  const isAdmin = currentRole === "Admin";
 
   if (loading) {
     return (

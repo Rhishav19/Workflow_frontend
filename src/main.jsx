@@ -10,6 +10,7 @@ import { TimeTrackingProvider } from "./context/TimeTrackingContext.jsx";
 import { MembersProvider } from "./context/MembersContext.jsx";
 import { BudgetProvider } from "./context/BudgetContext.jsx";
 import "./index.css";
+import { ActivityProvider } from "./context/ActivityContext";
 import { AnnouncementsProvider } from "./context/AnnouncementContext.jsx";
 import { DocsProvider } from "./context/DocsContext.jsx";
 import { NotificationsProvider } from "./context/NotificationsContext.jsx";
@@ -29,9 +30,9 @@ createRoot(document.getElementById("root")).render(
                       <DocsProvider>
                         <NotificationsProvider>
                           <BudgetProvider>
-                            
+                            <OrgChartProvider>
                               <App />
-                            
+                            </OrgChartProvider>
                           </BudgetProvider>
                         </NotificationsProvider>
                       </DocsProvider>

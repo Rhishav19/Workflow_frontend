@@ -7,7 +7,7 @@ const OrgChartContext = createContext(null);
 
 export function OrgChartProvider({ children }) {
   const { user } = useAuth();
-  const { workspaceId } = useWorkspace();
+  const { workspaceId, currentRole } = useWorkspace();
   const [members, setMembers] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -108,12 +108,11 @@ export function OrgChartProvider({ children }) {
   const visibleTree = useMemo(() => {
     if (!user) return [];
 
-    const userRole = user.role;
     const userMember = members.find((m) => m.email === user.email);
 
-    if (userRole === "Admin") return tree;
+    if (currentRole === "Admin") return tree;
 
-    if (userRole === "Manager" && userMember) {
+    if (currentRole === "Manager" && userMember) {
       // Show own subtree + manager chain
       const deptMembers = members.filter(
         (m) => m.department === userMember.department
@@ -136,7 +135,7 @@ export function OrgChartProvider({ children }) {
       return deptRoots;
     }
 
-    if (userRole === "Employee" && userMember) {
+    if (currentRole === "Employee" && userMember) {
       // Show: manager, self, peers, direct reports
       const relevantIds = new Set([userMember.id]);
       if (userMember.reportsTo) relevantIds.add(userMember.reportsTo);
@@ -174,7 +173,7 @@ export function OrgChartProvider({ children }) {
     }
 
     return [];
-  }, [tree, members, user]);
+  }, [tree, members, user, currentRole]);
 
   return (
     <OrgChartContext.Provider

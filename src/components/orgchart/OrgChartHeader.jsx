@@ -1,4 +1,4 @@
-import { Sitemap, Users } from "lucide-react";
+import { Network, Users } from "lucide-react";
 import { useOrgChart } from "../../context/OrgChartContext";
 
 const OrgChartHeader = () => {
@@ -8,7 +8,7 @@ const OrgChartHeader = () => {
     <div className="flex items-center justify-between">
       <div>
         <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-          <Sitemap className="w-6 h-6 text-blue-600" />
+          <Network className="w-6 h-6 text-blue-600" />
           Organization Chart
         </h1>
         <p className="text-gray-500 text-sm mt-1">

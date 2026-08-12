@@ -42,6 +42,7 @@ function App() {
           <Route path="docs" element={<Docs />} />
           <Route path="announcements" element={<Announcements />} />
           <Route path="settings" element={<Settings />} />
+          <Route path="org-chart" element={<OrgChart />} />
             {/* Budget — Admin & Manager only */}
             <Route element={<AdminManagerRoute />}>
               <Route path="/dashboard/budget" element={<Budget />} />
