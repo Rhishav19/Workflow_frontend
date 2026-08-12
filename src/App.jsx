@@ -17,6 +17,7 @@ import Activity from "./pages/Activity";
 import Docs from "./pages/Docs";
 import Announcements from "./pages/Announcements";
 import Settings from "./pages/Settings";
+import OrgChart from "./pages/OrgChart";
 import CreateAccount from "./pages/admin/CreateAccount";
 import AdminManagerRoute from "./components/AdminManagerRoute";
 import Budget from "./pages/Budget";
@@ -41,6 +42,7 @@ function App() {
           <Route path="docs" element={<Docs />} />
           <Route path="announcements" element={<Announcements />} />
           <Route path="settings" element={<Settings />} />
+          <Route path="org-chart" element={<OrgChart />} />
             {/* Budget — Admin & Manager only */}
             <Route element={<AdminManagerRoute />}>
               <Route path="/dashboard/budget" element={<Budget />} />
