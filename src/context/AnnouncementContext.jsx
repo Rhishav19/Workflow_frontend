@@ -1,6 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
-import { createNotification } from "../data/notificationsApi";
 
 const AnnouncementsContext = createContext(null);
 
@@ -10,6 +9,21 @@ export function AnnouncementsProvider({ children }) {
 
   useEffect(() => {
     fetchAnnouncements();
+
+    const channel = supabase
+      .channel("announcements-changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "announcements" },
+        () => {
+          fetchAnnouncements();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   async function fetchAnnouncements() {
@@ -31,64 +45,70 @@ export function AnnouncementsProvider({ children }) {
         department: a.department,
         priority: a.priority,
         pinned: a.pinned,
-        postedAt: a.posted_at,
+        createdAt: a.created_at,
       }));
       setAnnouncements(mapped);
     }
     setLoading(false);
   }
 
-  async function addAnnouncement(announcement) {
+  async function addAnnouncement(newAnnouncement) {
     const { error } = await supabase.from("announcements").insert({
-      id: announcement.id,
-      workspace_id: announcement.workspaceId,
-      title: announcement.title,
-      body: announcement.body,
-      author: announcement.author,
-      department: announcement.department,
-      priority: announcement.priority,
-      pinned: announcement.pinned,
-      posted_at: announcement.postedAt,
+      id: newAnnouncement.id,
+      workspace_id: newAnnouncement.workspaceId,
+      title: newAnnouncement.title,
+      body: newAnnouncement.body,
+      author: newAnnouncement.author,
+      department: newAnnouncement.department,
+      priority: newAnnouncement.priority,
+      pinned: newAnnouncement.pinned,
     });
 
     if (error) {
       console.error("Error creating announcement:", error);
-      return;
+      return { error };
     }
 
-    setAnnouncements((prev) => [announcement, ...prev]);
-
-    createNotification({
-      workspaceId: announcement.workspaceId,
-      type: "announcement",
-      message: `New announcement: "${announcement.title}"`,
-    });
+    await fetchAnnouncements();
+    return { error: null };
   }
 
   async function togglePin(id) {
-    const target = announcements.find((a) => a.id === id);
-    if (!target) return;
+    const current = announcements.find((a) => a.id === id);
+    if (!current) return;
 
-    const newPinned = !target.pinned;
+    const nextPinned = !current.pinned;
 
     const { error } = await supabase
       .from("announcements")
-      .update({ pinned: newPinned })
+      .update({ pinned: nextPinned })
       .eq("id", id);
 
     if (error) {
-      console.error("Error toggling pin:", error);
+      console.error("Error updating announcement:", error);
       return;
     }
 
     setAnnouncements((prev) =>
-      prev.map((a) => (a.id === id ? { ...a, pinned: newPinned } : a))
+      prev.map((a) => (a.id === id ? { ...a, pinned: nextPinned } : a))
     );
+  }
+
+ async function deleteAnnouncement(id) {
+    const { error } = await supabase.from("announcements").delete().eq("id", id);
+
+    if (error) {
+      console.error("Error deleting announcement:", error);
+      return { error };
+    }
+
+    setAnnouncements((prev) => prev.filter((a) => a.id !== id));
+    return { error: null };
   }
 
   return (
     <AnnouncementsContext.Provider
-      value={{ announcements, addAnnouncement, togglePin, loading }}
+      value={{ announcements, loading, addAnnouncement, togglePin, deleteAnnouncement }}
     >
       {children}
     </AnnouncementsContext.Provider>

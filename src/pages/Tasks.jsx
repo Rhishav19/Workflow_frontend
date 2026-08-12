@@ -3,6 +3,8 @@ import TasksHeader from "../components/tasks/TasksHeader";
 import KanbanBoard from "../components/tasks/KanbanBoard";
 import NewTaskModal from "../components/tasks/NewTaskModal";
 import SubmitTaskModal from "../components/tasks/SubmitTaskModal";
+import RequestChangesModal from "../components/tasks/RequestChangesModal";
+import ApproveTaskModal from "../components/tasks/ApproveTaskModal";
 import { useTasks } from "../context/TasksContext";
 import { useWorkspace } from "../context/WorkspaceContext";
 
@@ -20,11 +22,23 @@ export default function Tasks() {
   } = useTasks();
   const [modalOpen, setModalOpen] = useState(false);
   const [submittingTask, setSubmittingTask] = useState(null);
+  const [requestingTask, setRequestingTask] = useState(null);
+  const [approvingTask, setApprovingTask] = useState(null);
 
   const workspaceTasks = tasks.filter((t) => t.workspaceId === workspaceId);
 
   function handleCreate(newTask) {
     addTask({ ...newTask, workspaceId });
+  }
+
+  function handleRequestChanges(taskId, note) {
+    requestChanges(taskId, note);
+    setRequestingTask(null);
+  }
+
+  function handleApprove(taskId, note) {
+    approveTask(taskId, note);
+    setApprovingTask(null);
   }
 
   return (
@@ -35,8 +49,8 @@ export default function Tasks() {
         onMoveTask={moveTask}
         onChangePriority={changePriority}
         onOpenSubmit={setSubmittingTask}
-        onApprove={approveTask}
-        onRequestChanges={requestChanges}
+        onApprove={setApprovingTask}
+        onRequestChanges={setRequestingTask}
         onDelete={deleteTask}
       />
 
@@ -52,6 +66,22 @@ export default function Tasks() {
             submitTask(taskId, submission);
             setSubmittingTask(null);
           }}
+        />
+      )}
+
+      {requestingTask && (
+        <RequestChangesModal
+          task={requestingTask}
+          onClose={() => setRequestingTask(null)}
+          onSubmit={handleRequestChanges}
+        />
+      )}
+
+      {approvingTask && (
+        <ApproveTaskModal
+          task={approvingTask}
+          onClose={() => setApprovingTask(null)}
+          onSubmit={handleApprove}
         />
       )}
     </div>

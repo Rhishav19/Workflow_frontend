@@ -1,6 +1,6 @@
 import AnnouncementCard from "./AnnouncementCard";
 
-export default function AnnouncementsList({ announcements, onTogglePin }) {
+export default function AnnouncementsList({ announcements, onTogglePin, onDelete }) {
   if (announcements.length === 0) {
     return (
       <div className="rounded-2xl border border-dashed border-gray-200 bg-white/60 px-6 py-16 text-center">
@@ -23,6 +23,7 @@ export default function AnnouncementsList({ announcements, onTogglePin }) {
           key={announcement.id}
           announcement={announcement}
           onTogglePin={onTogglePin}
+          onDelete={onDelete}
         />
       ))}
     </div>

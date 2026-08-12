@@ -37,12 +37,6 @@ const StatsSection = () => {
       />
 
       <StatCard
-        title="Budget"
-        value="—"
-        color="text-purple-600"
-      />
-
-      <StatCard
         title="Team Members"
         value={workspaceMembers.length}
         color="text-orange-500"

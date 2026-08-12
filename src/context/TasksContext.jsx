@@ -22,7 +22,7 @@ export function TasksProvider({ children }) {
     if (error) {
       console.error("Error fetching tasks:", error);
     } else {
-      const mapped = data.map((t) => ({
+      const mapped = (data || []).map((t) => ({
         id: t.id,
         workspaceId: t.workspace_id,
         projectId: t.project_id,
@@ -32,6 +32,8 @@ export function TasksProvider({ children }) {
         dueDate: t.due_date,
         status: t.status,
         submission: t.submission,
+        changesNote: t.changes_note,
+        changeNote: t.change_note,
       }));
       setTasks(mapped);
     }
@@ -70,6 +72,8 @@ export function TasksProvider({ children }) {
     if ("status" in updates) dbUpdates.status = updates.status;
     if ("priority" in updates) dbUpdates.priority = updates.priority;
     if ("submission" in updates) dbUpdates.submission = updates.submission;
+    if ("changesNote" in updates) dbUpdates.changes_note = updates.changesNote;
+    if ("changeNote" in updates) dbUpdates.change_note = updates.changeNote;
 
     const { error } = await supabase
       .from("tasks")
@@ -84,6 +88,15 @@ export function TasksProvider({ children }) {
     setTasks((prev) =>
       prev.map((t) => (t.id === taskId ? { ...t, ...updates } : t))
     );
+  }
+
+  async function deleteTask(taskId) {
+    const { error } = await supabase.from("tasks").delete().eq("id", taskId);
+    if (error) {
+      console.error("Error deleting task:", error);
+      return;
+    }
+    setTasks((prev) => prev.filter((t) => t.id !== taskId));
   }
 
   function moveTask(taskId, newStatus) {
@@ -118,9 +131,9 @@ export function TasksProvider({ children }) {
     }
   }
 
-  function approveTask(taskId) {
+  function approveTask(taskId, note = "") {
     const task = tasks.find((t) => t.id === taskId);
-    updateTask(taskId, { status: "Done" });
+    updateTask(taskId, { status: "Done", changeNote: note || null });
 
     if (task) {
       createNotification({
@@ -132,15 +145,20 @@ export function TasksProvider({ children }) {
     }
   }
 
-  function requestChanges(taskId) {
+  function requestChanges(taskId, note) {
     const task = tasks.find((t) => t.id === taskId);
-    updateTask(taskId, { status: "In Progress", submission: null });
+    updateTask(taskId, {
+      status: "In Progress",
+      submission: null,
+      changesNote: note,
+      changeNote: note,
+    });
 
     if (task) {
       createNotification({
         workspaceId: task.workspaceId,
         type: "task_changes",
-        message: `Changes requested on "${task.title}"`,
+        message: `Changes requested on "${task.title}": ${note}`,
         targetInitials: task.assignee,
       });
     }
@@ -153,6 +171,7 @@ export function TasksProvider({ children }) {
         loading,
         addTask,
         updateTask,
+        deleteTask,
         moveTask,
         changePriority,
         submitTask,

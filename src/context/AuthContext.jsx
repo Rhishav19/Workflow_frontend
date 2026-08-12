@@ -18,7 +18,8 @@ export function AuthProvider({ children }) {
   }, [user]);
 
   function login(account) {
-    const { password, ...safeUser } = account;
+    const safeUser = { ...account };
+    delete safeUser.password;
     setUser(safeUser);
   }
 

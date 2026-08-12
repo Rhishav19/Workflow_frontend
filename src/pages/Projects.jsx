@@ -9,7 +9,7 @@ import { useWorkspace } from "../context/WorkspaceContext";
 
 export default function Projects() {
   const { workspaceId } = useWorkspace();
-  const { projects, addProject } = useProjects();
+  const { projects, addProject, deleteProject } = useProjects();
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState("All");
   const [modalOpen, setModalOpen] = useState(false);
@@ -18,8 +18,9 @@ export default function Projects() {
   useEffect(() => {
     if (searchParams.get("new") === "true") {
       setModalOpen(true);
-      searchParams.delete("new");
-      setSearchParams(searchParams, { replace: true });
+      const nextParams = new URLSearchParams(searchParams);
+      nextParams.delete("new");
+      setSearchParams(nextParams, { replace: true });
     }
   }, [searchParams, setSearchParams]);
 
@@ -48,7 +49,7 @@ export default function Projects() {
         activeFilter={filter}
         onFilterChange={setFilter}
       />
-      <ProjectsGrid projects={filtered} />
+      <ProjectsGrid projects={filtered} onDelete={deleteProject} />
 
       {modalOpen && (
         <NewProjectModal onClose={() => setModalOpen(false)} onCreate={handleCreate} />

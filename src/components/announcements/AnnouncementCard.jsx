@@ -1,7 +1,24 @@
-import { Pin } from "lucide-react";
+import { Pin, Trash2 } from "lucide-react";
 import { PRIORITY_STYLES } from "../../data/announcements";
+import { formatRelativeTime } from "../../utils/formattime";
+import { hasPermission } from "../../data/permissions";
+import { useWorkspace } from "../../context/WorkspaceContext";
+import { useAuth } from "../../context/AuthContext";
 
-export default function AnnouncementCard({ announcement, onTogglePin }) {
+export default function AnnouncementCard({ announcement, onTogglePin, onDelete }) {
+  const { currentRole } = useWorkspace();
+  const { user } = useAuth();
+
+  const canDelete =
+    hasPermission(currentRole, "canDeleteAnnouncement") ||
+    announcement.author === user?.name;
+
+  function handleDelete() {
+    if (window.confirm("Delete this announcement? This can't be undone.")) {
+      onDelete(announcement.id);
+    }
+  }
+
   return (
     <div
       className={`rounded-2xl border bg-white p-5 transition-colors ${
@@ -34,14 +51,25 @@ export default function AnnouncementCard({ announcement, onTogglePin }) {
         <p className="text-xs text-gray-400">
           <span className="font-medium text-gray-500">{announcement.author}</span>
           {" · "}
-          {announcement.department} · {announcement.postedAt}
+          {announcement.department} · {formatRelativeTime(announcement.createdAt)}
         </p>
-        <button
-          onClick={() => onTogglePin(announcement.id)}
-          className="text-xs font-medium text-blue-600 hover:underline"
-        >
-          {announcement.pinned ? "Unpin" : "Pin"}
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => onTogglePin(announcement.id)}
+            className="text-xs font-medium text-blue-600 hover:underline"
+          >
+            {announcement.pinned ? "Unpin" : "Pin"}
+          </button>
+          {canDelete && (
+            <button
+              onClick={handleDelete}
+              title="Delete announcement"
+              className="text-gray-400 hover:text-red-600"
+            >
+              <Trash2 size={15} />
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

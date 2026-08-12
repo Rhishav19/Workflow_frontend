@@ -1,5 +1,6 @@
 import {
   LayoutDashboard,
+  ChartNoAxesCombined,
   FolderKanban,
   CheckSquare,
   Clock3,
@@ -7,8 +8,8 @@ import {
   FileText,
   Megaphone,
   UserPlus,
+  Wallet,
 } from "lucide-react";
-
 import { NavLink } from "react-router-dom";
 import WorkspaceSwitcher from "./WorkspaceSwitcher";
 import { useWorkspace } from "../context/WorkspaceContext";
@@ -16,6 +17,7 @@ import { Sitemap } from "lucide-react";
 
 const menus = [
   { name: "Dashboard", icon: <LayoutDashboard size={20} />, path: "/dashboard" },
+  { name: "Analytics", icon: <ChartNoAxesCombined size={20} />, path: "/dashboard/analytics" },
   { name: "Projects", icon: <FolderKanban size={20} />, path: "/dashboard/projects" },
   { name: "Tasks", icon: <CheckSquare size={20} />, path: "/dashboard/tasks" },
   { name: "Time Tracking", icon: <Clock3 size={20} />, path: "/dashboard/time-tracking" },
@@ -27,45 +29,56 @@ const menus = [
 
 const Sidebar = () => {
   const { currentRole } = useWorkspace();
+  const isAdminOrManager = currentRole === "Admin" || currentRole === "Manager";
 
-  const visibleMenus =
-    currentRole === "Admin"
+  const visibleMenus = [
+    ...menus,
+    ...(isAdminOrManager
+      ? [{ name: "Budget", icon: <Wallet size={20} />, path: "/dashboard/budget" }]
+      : []),
+    ...(currentRole === "Admin"
       ? [
-          ...menus,
           {
             name: "Create Account",
             icon: <UserPlus size={20} />,
             path: "/dashboard/admin/create-account",
           },
         ]
-      : menus;
+      : []),
+  ];
 
   return (
-    <aside className="w-64 bg-white shadow-lg border-r">
-      <div className="text-2xl font-bold p-6 border-b">
+    <aside className="w-full border-b bg-white shadow-lg lg:min-h-screen lg:w-64 lg:border-b-0 lg:border-r">
+      <div className="border-b p-4 text-2xl font-bold lg:p-6">
         Workflow
       </div>
-
       <WorkspaceSwitcher />
-
-      <nav className="mt-4">
-        {visibleMenus.map((menu) => (
+      <nav className="mt-2 flex overflow-x-auto lg:mt-4 lg:block lg:space-y-2 lg:px-2">
+        {visibleMenus.map((item) => (
           <NavLink
-            key={menu.name}
-            to={menu.path}
-            end={menu.path === "/dashboard"}
+            key={item.name}
+            to={item.path}
             className={({ isActive }) =>
-              `flex items-center gap-3 px-6 py-4 transition-all ${
-                isActive ? "bg-blue-600 text-white" : "text-gray-700 hover:bg-gray-100"
+              `flex shrink-0 items-center gap-2.5 px-4 py-3 text-sm font-medium transition-all lg:gap-3 lg:rounded-xl lg:px-4 lg:py-3 lg:text-base ${
+                isActive
+                  ? "bg-blue-600 text-white shadow-md"
+                  : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
               }`
             }
           >
-            {menu.icon}
-            <span>{menu.name}</span>
+            {({ isActive }) => (
+              <>
+                <span className={isActive ? "text-white" : "text-gray-400"}>
+                  {item.icon}
+                </span>
+                <span>{item.name}</span>
+              </>
+            )}
           </NavLink>
         ))}
       </nav>
     </aside>
   );
 };
+
 export default Sidebar;

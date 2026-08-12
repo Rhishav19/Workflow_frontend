@@ -24,12 +24,11 @@ const Navbar = () => {
   }
 
   return (
-    <header className="bg-white shadow-sm px-8 py-4 flex justify-between items-center">
+    <header className="flex flex-col gap-3 bg-white px-4 py-4 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:px-8">
       <SearchDropdown />
 
-      <div className="flex items-center gap-5">
+     <div className="flex items-center gap-5">
         <NotificationsDropdown />
-
         <Link to="/dashboard/settings">
           <Settings className="cursor-pointer text-gray-600 hover:text-blue-600" />
         </Link>
