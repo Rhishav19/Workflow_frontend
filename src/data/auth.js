@@ -50,7 +50,7 @@ function generateTempPassword() {
   return Math.random().toString(36).slice(-8);
 }
 
-export async function createAccount({ name, email }) {
+export async function createAccount({ name, email, role }) {
   const normalizedEmail = email.trim().toLowerCase();
   const tempPassword = generateTempPassword();
 
@@ -59,6 +59,7 @@ export async function createAccount({ name, email }) {
     p_name: name,
     p_password: tempPassword,
     p_must_change: true,
+    p_role: role ?? "Employee",
   });
 
   if (error) {
@@ -85,6 +86,7 @@ export async function registerAdminAccount({ name, email, password }) {
     p_name: name,
     p_password: password,
     p_must_change: false,
+    p_role: "Admin",
   });
 
   if (error) {
@@ -97,6 +99,6 @@ export async function registerAdminAccount({ name, email, password }) {
 
   return {
     ok: true,
-    account: { email: normalizedEmail, name, mustChangePassword: false },
+    account: { email: normalizedEmail, name, mustChangePassword: false, role: "Admin" },
   };
 }

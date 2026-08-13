@@ -9,11 +9,12 @@ import {
   Megaphone,
   UserPlus,
   Wallet,
+  Network,
+  CalendarClock,
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import WorkspaceSwitcher from "./WorkspaceSwitcher";
 import { useWorkspace } from "../context/WorkspaceContext";
-import { Network } from "lucide-react";
 
 const menus = [
   { name: "Dashboard", icon: <LayoutDashboard size={20} />, path: "/dashboard" },
@@ -25,6 +26,7 @@ const menus = [
   { name: "Docs", icon: <FileText size={20} />, path: "/dashboard/docs" },
   { name: "Announcements", icon: <Megaphone size={20} />, path: "/dashboard/announcements" },
   { name: "Org Chart", icon: <Network size={20} />, path: "/dashboard/org-chart" },
+  { name: "Meetings", icon: <CalendarClock size={20} />, path: "/dashboard/meetings" },
 ];
 
 const Sidebar = () => {
