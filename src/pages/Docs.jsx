@@ -6,6 +6,7 @@ import UploadDocModal from "../components/docs/UploadDocModal";
 import { useDocs } from "../context/DocsContext";
 import { useWorkspace } from "../context/WorkspaceContext";
 import { useAuth } from "../context/AuthContext";
+import { useActivity } from "../context/ActivityContext";
 
 export default function Docs() {
   const { workspaceId } = useWorkspace();
